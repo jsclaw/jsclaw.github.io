@@ -208,21 +208,16 @@
     }
 
     /* --- ARCH --- */
-    .arch-diagram {
+    .arch-svg-wrap {
       background: var(--bg-code);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 32px;
-      font-size: 0.82rem;
-      line-height: 1.6;
+      padding: 32px 16px;
+      display: flex;
+      justify-content: center;
       overflow-x: auto;
-      text-align: center;
     }
-    .arch-diagram pre {
-      display: inline-block; text-align: left;
-      color: var(--text-secondary);
-    }
-    .arch-diagram .hl { color: var(--accent); font-weight: 600; }
+    .arch-svg-wrap svg { max-width: 100%; height: auto; }
 
     /* --- API TABLE --- */
     .api-table {
@@ -294,14 +289,14 @@
   <div class="hero">
     <div class="badge-row" style="justify-content:center; margin-bottom: 20px;">
       <img src="https://img.shields.io/npm/v/jsclaw?color=2563eb&label=npm" alt="npm version">
-      <img src="https://img.shields.io/badge/license-MIT-059669" alt="MIT license">
-      <img src="https://img.shields.io/badge/node-%3E%3D20-555770" alt="node >= 20">
+      <img src="https://img.shields.io/badge/pure_JS-ESM-f7df1e?logo=javascript&logoColor=000" alt="Pure JavaScript ESM">
       <img src="https://img.shields.io/badge/deps-0-059669" alt="zero dependencies">
+      <img src="https://img.shields.io/badge/license-MIT-059669" alt="MIT license">
     </div>
-    <h1>Container orchestration<br>for <span class="highlight">Claude AI</span> agents</h1>
+    <h1>Pure <span class="highlight">JavaScript</span> container<br>orchestration for Claude AI agents</h1>
     <p class="tagline">
       Run Claude agents in isolated Docker containers with streaming output,
-      filesystem IPC, and built-in MCP tools. Pure JavaScript. Zero dependencies.
+      filesystem IPC, and built-in MCP tools. Plain .js files. No build step. Zero dependencies.
     </p>
     <div class="install-box" onclick="copyInstall(this)">
       <span class="dollar">$</span>
@@ -361,7 +356,7 @@
   <section id="quickstart">
     <div class="section-inner">
       <h2 class="section-title">Quick start</h2>
-      <p class="section-subtitle">Three steps to running your first containerized Claude agent.</p>
+      <p class="section-subtitle">Install, configure, run. Plain JavaScript &mdash; no compilation, no transpilation.</p>
 
       <div style="margin-bottom: 24px;">
         <div class="code-tabs">
@@ -369,30 +364,13 @@
         </div>
         <div class="code-block"><pre><span class="kw">import</span> { <span class="fn">runContainerAgent</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
 
-<span class="kw">const</span> config = <span class="fn">createConfig</span>({
-  <span class="prop">containerImage</span>: <span class="str">'jsclaw-agent:latest'</span>,
-  <span class="prop">dataDir</span>:         <span class="str">'./data'</span>,
-  <span class="prop">groupsDir</span>:      <span class="str">'./groups'</span>,
-});
-
-<span class="kw">const</span> group = { <span class="prop">name</span>: <span class="str">'my-agent'</span>, <span class="prop">folder</span>: <span class="str">'my-agent'</span> };
-
-<span class="kw">const</span> input = {
-  <span class="prop">prompt</span>:      <span class="str">'Analyze the codebase and suggest improvements.'</span>,
-  <span class="prop">groupFolder</span>: <span class="str">'my-agent'</span>,
-  <span class="prop">chatJid</span>:     <span class="str">'user-1'</span>,
-  <span class="prop">isMain</span>:      <span class="num">true</span>,
-};
-
 <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runContainerAgent</span>(
-  group,
-  input,
-  (proc, name) =&gt; console.<span class="fn">log</span>(<span class="str">`Container</span> <span class="str">${name} started`</span>),
-  <span class="kw">async</span> (output) =&gt; console.<span class="fn">log</span>(<span class="str">'Agent:'</span>, output.result),
-  config,
-);
-
-console.<span class="fn">log</span>(<span class="str">'Done:'</span>, result.status);</pre></div>
+  { <span class="prop">name</span>: <span class="str">'my-agent'</span>, <span class="prop">folder</span>: <span class="str">'my-agent'</span> },
+  { <span class="prop">prompt</span>: <span class="str">'Analyze the codebase and suggest improvements.'</span>,
+    <span class="prop">groupFolder</span>: <span class="str">'my-agent'</span>, <span class="prop">chatJid</span>: <span class="str">'user-1'</span>, <span class="prop">isMain</span>: <span class="num">true</span> },
+  (proc, name) =&gt; console.<span class="fn">log</span>(<span class="str">`Started</span> <span class="str">${name}`</span>),
+  <span class="kw">async</span> (output) =&gt; console.<span class="fn">log</span>(output.result),
+);</pre></div>
       </div>
     </div>
   </section>
@@ -402,26 +380,74 @@ console.<span class="fn">log</span>(<span class="str">'Done:'</span>, result.sta
     <div class="section-inner">
       <h2 class="section-title">Architecture</h2>
       <p class="section-subtitle">Host process communicates with isolated containers via stdin/stdout and filesystem IPC.</p>
-      <div class="arch-diagram">
-<pre>
-  <span class="hl">Host Process (your app)</span>                <span class="hl">Docker Container</span>
- ┌─────────────────────────┐           ┌─────────────────────────┐
- │                         │           │                         │
- │  container-runner.js    │──stdin──▶ │  agent-runner.js        │
- │  <span style="color:#059669">Spawns containers,</span>     │◀─stdout── │  <span style="color:#059669">Drives Claude SDK</span>       │
- │  <span style="color:#059669">streams output</span>         │           │                         │
- │                         │           │  mcp-server.js          │
- │  ipc.js                 │◀──files── │  <span style="color:#059669">send_message,</span>          │
- │  <span style="color:#059669">Polls IPC directories</span>  │──files──▶ │  <span style="color:#059669">schedule_task, ...</span>      │
- │                         │           │                         │
- │  group-queue.js         │           │  /workspace/group/      │
- │  <span style="color:#059669">Concurrency control</span>    │           │  <span style="color:#059669">Isolated filesystem</span>    │
- │                         │           │                         │
- └─────────────────────────┘           └─────────────────────────┘
-         │                                       │
-    <span style="color:#2563eb">data/ipc/{group}/</span>                     <span style="color:#2563eb">/workspace/ipc/</span>
-    messages/ tasks/ input/              messages/ tasks/ input/
-</pre>
+      <div class="arch-svg-wrap">
+        <svg viewBox="0 0 820 400" width="820" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+          <!-- Host box -->
+          <rect x="20" y="40" width="340" height="260" rx="12" fill="#ffffff" stroke="#e2e5ea" stroke-width="1.5"/>
+          <text x="190" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Host Process (your app)</text>
+          <!-- Host modules -->
+          <rect x="40" y="70" width="200" height="48" rx="8" fill="#dbeafe"/>
+          <text x="140" y="90" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">container-runner.js</text>
+          <text x="140" y="107" text-anchor="middle" font-size="11" fill="#555770">Spawns containers, streams output</text>
+
+          <rect x="40" y="138" width="200" height="48" rx="8" fill="#dbeafe"/>
+          <text x="140" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">ipc.js</text>
+          <text x="140" y="175" text-anchor="middle" font-size="11" fill="#555770">Polls IPC directories</text>
+
+          <rect x="40" y="206" width="200" height="48" rx="8" fill="#dbeafe"/>
+          <text x="140" y="226" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">group-queue.js</text>
+          <text x="140" y="243" text-anchor="middle" font-size="11" fill="#555770">Concurrency control</text>
+
+          <!-- Container box -->
+          <rect x="460" y="40" width="340" height="260" rx="12" fill="#ffffff" stroke="#e2e5ea" stroke-width="1.5"/>
+          <text x="630" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Docker Container</text>
+          <!-- Container modules -->
+          <rect x="480" y="70" width="200" height="48" rx="8" fill="#d1fae5"/>
+          <text x="580" y="90" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">agent-runner.js</text>
+          <text x="580" y="107" text-anchor="middle" font-size="11" fill="#555770">Drives Claude SDK</text>
+
+          <rect x="480" y="138" width="200" height="48" rx="8" fill="#d1fae5"/>
+          <text x="580" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">mcp-server.js</text>
+          <text x="580" y="175" text-anchor="middle" font-size="11" fill="#555770">send_message, schedule_task</text>
+
+          <rect x="480" y="206" width="200" height="48" rx="8" fill="#d1fae5"/>
+          <text x="580" y="226" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">/workspace/group/</text>
+          <text x="580" y="243" text-anchor="middle" font-size="11" fill="#555770">Isolated filesystem</text>
+
+          <!-- Arrows: stdin/stdout -->
+          <defs>
+            <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2563eb"/></marker>
+            <marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#059669"/></marker>
+          </defs>
+          <!-- stdin arrow -->
+          <line x1="240" y1="86" x2="476" y2="86" stroke="#2563eb" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>
+          <rect x="330" y="74" width="58" height="20" rx="4" fill="#dbeafe"/>
+          <text x="359" y="88" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">stdin</text>
+          <!-- stdout arrow -->
+          <line x1="476" y1="102" x2="244" y2="102" stroke="#059669" stroke-width="2" marker-end="url(#ah2)" stroke-dasharray="6,3"/>
+          <rect x="326" y="93" width="66" height="20" rx="4" fill="#d1fae5"/>
+          <text x="359" y="107" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">stdout</text>
+
+          <!-- IPC arrows -->
+          <line x1="476" y1="155" x2="244" y2="155" stroke="#059669" stroke-width="2" marker-end="url(#ah2)" stroke-dasharray="6,3"/>
+          <rect x="330" y="143" width="58" height="20" rx="4" fill="#d1fae5"/>
+          <text x="359" y="157" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">files</text>
+          <line x1="240" y1="172" x2="476" y2="172" stroke="#2563eb" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>
+          <rect x="330" y="163" width="58" height="20" rx="4" fill="#dbeafe"/>
+          <text x="359" y="177" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">files</text>
+
+          <!-- IPC paths at bottom -->
+          <line x1="140" y1="300" x2="140" y2="330" stroke="#e2e5ea" stroke-width="1.5"/>
+          <line x1="580" y1="300" x2="580" y2="330" stroke="#e2e5ea" stroke-width="1.5"/>
+
+          <rect x="60" y="335" width="180" height="48" rx="8" fill="#f8f9fb" stroke="#e2e5ea" stroke-width="1"/>
+          <text x="150" y="355" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">data/ipc/{group}/</text>
+          <text x="150" y="372" text-anchor="middle" font-size="11" fill="#555770">messages/ tasks/ input/</text>
+
+          <rect x="490" y="335" width="180" height="48" rx="8" fill="#f8f9fb" stroke="#e2e5ea" stroke-width="1"/>
+          <text x="580" y="355" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">/workspace/ipc/</text>
+          <text x="580" y="372" text-anchor="middle" font-size="11" fill="#555770">messages/ tasks/ input/</text>
+        </svg>
       </div>
     </div>
   </section>
