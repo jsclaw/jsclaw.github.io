@@ -300,6 +300,7 @@
         <a href="#features">Features</a>
         <a href="#quickstart">Quick Start</a>
         <a href="#api">API</a>
+        <a href="#examples">Examples</a>
         <a href="https://github.com/jsclaw/jsclaw">GitHub</a>
         <a href="https://www.npmjs.com/package/jsclaw">npm</a>
       </div>
@@ -630,6 +631,49 @@
           </tbody>
         </table>
       </div>
+    </div>
+  </section>
+
+  <!-- TELEGRAM EXAMPLE -->
+  <section class="alt" id="examples">
+    <div class="section-inner">
+      <h2 class="section-title">Telegram Bot in 30 Lines</h2>
+      <p class="section-subtitle">Bring your own I/O &mdash; here's a full Telegram bot wired to jsclaw. Per-chat containers, session continuity, queue concurrency.</p>
+      <div style="margin-bottom: 24px;">
+        <div class="code-tabs">
+          <div class="code-tab active">examples/telegram.js</div>
+        </div>
+        <div class="code-block"><pre><span class="kw">import</span> { <span class="fn">Bot</span> } <span class="kw">from</span> <span class="str">'grammy'</span>;
+<span class="kw">import</span> { <span class="fn">runContainerAgent</span>, <span class="fn">GroupQueue</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
+
+<span class="kw">const</span> bot   = <span class="kw">new</span> <span class="fn">Bot</span>(process.env.<span class="prop">TELEGRAM_BOT_TOKEN</span>);
+<span class="kw">const</span> queue = <span class="kw">new</span> <span class="fn">GroupQueue</span>(<span class="fn">createConfig</span>());
+<span class="kw">const</span> sessions = <span class="kw">new</span> <span class="fn">Map</span>();
+
+bot.<span class="fn">on</span>(<span class="str">'message:text'</span>, <span class="kw">async</span> (ctx) =&gt; {
+  <span class="kw">const</span> id = String(ctx.chat.id);
+  <span class="kw">await</span> ctx.<span class="fn">replyWithChatAction</span>(<span class="str">'typing'</span>);
+
+  <span class="kw">await</span> queue.<span class="fn">enqueueTask</span>(id, <span class="str">`msg-${Date.now()}`</span>, <span class="kw">async</span> () =&gt; {
+    <span class="kw">await</span> <span class="fn">runContainerAgent</span>(
+      { <span class="prop">name</span>: id, <span class="prop">folder</span>: id },
+      { <span class="prop">prompt</span>: ctx.message.text, <span class="prop">groupFolder</span>: id,
+        <span class="prop">chatJid</span>: id, <span class="prop">isMain</span>: <span class="num">true</span>, <span class="prop">sessionId</span>: sessions.<span class="fn">get</span>(id) },
+      <span class="num">null</span>,
+      <span class="kw">async</span> (out) =&gt; {
+        <span class="kw">if</span> (out.result) <span class="kw">await</span> ctx.<span class="fn">reply</span>(out.result);
+        <span class="kw">if</span> (out.newSessionId) sessions.<span class="fn">set</span>(id, out.newSessionId);
+      },
+    );
+  });
+});
+
+bot.<span class="fn">start</span>();</pre></div>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">
+        Full example with error handling, message splitting, and graceful shutdown:
+        <a href="https://github.com/jsclaw/jsclaw/blob/main/examples/telegram.js">examples/telegram.js</a>
+      </p>
     </div>
   </section>
 
