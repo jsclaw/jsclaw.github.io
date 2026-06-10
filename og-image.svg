@@ -1,61 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8f9fb"/>
-      <stop offset="100%" stop-color="#e8ecf4"/>
-    </linearGradient>
-  </defs>
   <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <!-- Subtle grid dots -->
-  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-    <circle cx="20" cy="20" r="1" fill="#c8cdd6" opacity="0.5"/>
-  </pattern>
-  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="#FAF9F5"/>
+  <ellipse cx="380" cy="-120" rx="700" ry="300" fill="#F6EFE8"/>
+
   <!-- Logo mark -->
-  <rect x="80" y="160" width="64" height="64" rx="14" fill="#1a1a2e"/>
-  <text x="112" y="200" text-anchor="middle" font-family="'SF Mono', 'Cascadia Code', Consolas, monospace" font-weight="bold" font-size="30" fill="#4f8ff7">&gt;_</text>
-  <!-- Title -->
-  <text x="160" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="52" font-weight="800" fill="#1a1a2e">jsclaw</text>
-  <!-- Tagline -->
-  <text x="82" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" font-weight="600" fill="#1a1a2e">Pure <tspan fill="#2563eb">JavaScript</tspan> container orchestration</text>
-  <text x="82" y="324" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" font-weight="600" fill="#1a1a2e">for <tspan fill="#2563eb">Claude AI</tspan> agents</text>
-  <!-- Pills -->
-  <rect x="82" y="370" width="120" height="36" rx="18" fill="#dbeafe"/>
-  <text x="142" y="394" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="600" fill="#2563eb">Pure JS ESM</text>
-  <rect x="216" y="370" width="140" height="36" rx="18" fill="#d1fae5"/>
-  <text x="286" y="394" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="600" fill="#059669">0 Dependencies</text>
-  <rect x="370" y="370" width="100" height="36" rx="18" fill="#fef3c7"/>
-  <text x="420" y="394" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="600" fill="#92400e">MIT</text>
-  <rect x="484" y="370" width="130" height="36" rx="18" fill="#ede9fe"/>
-  <text x="549" y="394" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="600" fill="#6d28d9">MCP Tools</text>
-  <!-- Install command -->
-  <rect x="82" y="440" width="380" height="50" rx="10" fill="#1a1a2e"/>
-  <text x="102" y="472" font-family="'SF Mono', 'Cascadia Code', Consolas, monospace" font-size="18" fill="#059669">$</text>
-  <text x="122" y="472" font-family="'SF Mono', 'Cascadia Code', Consolas, monospace" font-size="18" fill="#e2e8f0">npm install jsclaw</text>
-  <!-- URL -->
-  <text x="82" y="546" font-family="-apple-system, sans-serif" font-size="18" fill="#555770">jsclaw.dev</text>
-  <!-- Decorative container boxes on the right -->
-  <rect x="750" y="120" width="360" height="380" rx="16" fill="#ffffff" stroke="#e2e5ea" stroke-width="1.5" opacity="0.8"/>
-  <rect x="770" y="150" width="220" height="44" rx="8" fill="#dbeafe"/>
-  <text x="880" y="178" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#1a1a2e">container-runner.js</text>
-  <rect x="770" y="210" width="220" height="44" rx="8" fill="#dbeafe"/>
-  <text x="880" y="238" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#1a1a2e">ipc.js</text>
-  <rect x="770" y="270" width="220" height="44" rx="8" fill="#dbeafe"/>
-  <text x="880" y="298" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#1a1a2e">group-queue.js</text>
-  <rect x="770" y="330" width="220" height="44" rx="8" fill="#d1fae5"/>
-  <text x="880" y="358" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#1a1a2e">agent-runner.js</text>
-  <rect x="770" y="390" width="220" height="44" rx="8" fill="#d1fae5"/>
-  <text x="880" y="418" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#1a1a2e">mcp-server.js</text>
-  <!-- Dashed connection lines -->
-  <line x1="1010" y1="172" x2="1060" y2="172" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="1010" y1="232" x2="1060" y2="232" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="1060" y1="172" x2="1060" y2="352" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="1010" y1="352" x2="1060" y2="352" stroke="#059669" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="1010" y1="412" x2="1060" y2="412" stroke="#059669" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="1060" y1="352" x2="1060" y2="412" stroke="#059669" stroke-width="2" stroke-dasharray="4,3"/>
-  <!-- Labels for host/container -->
-  <text x="880" y="142" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#2563eb" letter-spacing="0.05em">HOST</text>
-  <text x="880" y="326" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#059669" letter-spacing="0.05em">CONTAINER</text>
-  <line x1="770" y1="330" x2="990" y2="330" stroke="#e2e5ea" stroke-width="1" stroke-dasharray="3,3"/>
+  <rect x="84" y="92" width="58" height="58" rx="13" fill="#24231F"/>
+  <text x="113" y="130" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="25" fill="#C15F3C">&gt;_</text>
+  <text x="162" y="133" font-family="Georgia, serif" font-size="44" font-weight="600" fill="#161614">jsclaw</text>
+
+  <!-- Headline -->
+  <text x="86" y="248" font-family="Georgia, serif" font-size="58" fill="#161614">Claude agents, each in</text>
+  <text x="86" y="318" font-family="Georgia, serif" font-size="58" font-style="italic" fill="#C15F3C">its own container.</text>
+
+  <!-- Sub -->
+  <text x="87" y="372" font-family="-apple-system, Helvetica, sans-serif" font-size="23" fill="#63615C">Heartbeat autonomy · Markdown memory · zero deps</text>
+
+  <!-- Install pill -->
+  <rect x="84" y="420" width="350" height="58" rx="29" fill="#24231F"/>
+  <text x="112" y="457" font-family="monospace" font-size="20" fill="#7D9B76">$</text>
+  <text x="134" y="457" font-family="monospace" font-size="20" fill="#ECEAE2">npm install jsclaw</text>
+
+  <!-- Stats -->
+  <text x="86" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">0</text>
+  <text x="86" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">DEPENDENCIES</text>
+  <line x1="222" y1="528" x2="222" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
+  <text x="246" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">~40 kB</text>
+  <text x="246" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">INSTALLED</text>
+  <line x1="400" y1="528" x2="400" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
+  <text x="424" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">63</text>
+  <text x="424" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">TESTS</text>
+  <line x1="520" y1="528" x2="520" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
+  <text x="544" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">jsclaw.dev</text>
+  <text x="544" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">PURE JAVASCRIPT · MIT</text>
+
+  <!-- Right: stacked module cards -->
+  <rect x="790" y="120" width="330" height="404" rx="16" fill="#FFFFFF" stroke="#E5E2D9" stroke-width="1.5"/>
+  <text x="955" y="106" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#C15F3C">HOST → CONTAINER</text>
+
+  <rect x="812" y="144" width="286" height="52" rx="10" fill="#F3E5DD"/>
+  <text x="955" y="170" text-anchor="middle" font-family="monospace" font-size="16" font-weight="600" fill="#161614">container-runner</text>
+  <text x="955" y="188" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#63615C">spawn · stream · isolate</text>
+
+  <rect x="812" y="208" width="286" height="52" rx="10" fill="#F3E5DD"/>
+  <text x="955" y="234" text-anchor="middle" font-family="monospace" font-size="16" font-weight="600" fill="#161614">heartbeat · scheduler</text>
+  <text x="955" y="252" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#63615C">autonomy on a timer</text>
+
+  <rect x="812" y="272" width="286" height="52" rx="10" fill="#F3E5DD"/>
+  <text x="955" y="298" text-anchor="middle" font-family="monospace" font-size="16" font-weight="600" fill="#161614">skills · memory</text>
+  <text x="955" y="316" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#63615C">SKILL.md · markdown context</text>
+
+  <line x1="826" y1="338" x2="1084" y2="338" stroke="#E5E2D9" stroke-width="1.2" stroke-dasharray="4,4"/>
+
+  <rect x="812" y="352" width="286" height="52" rx="10" fill="#E9EFE4"/>
+  <text x="955" y="378" text-anchor="middle" font-family="monospace" font-size="16" font-weight="600" fill="#161614">agent-runner</text>
+  <text x="955" y="396" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#63615C">drives the Claude SDK</text>
+
+  <rect x="812" y="416" width="286" height="52" rx="10" fill="#E9EFE4"/>
+  <text x="955" y="442" text-anchor="middle" font-family="monospace" font-size="16" font-weight="600" fill="#161614">mcp-server</text>
+  <text x="955" y="460" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#63615C">send_message · schedule_task</text>
+
+  <text x="955" y="502" text-anchor="middle" font-family="monospace" font-size="13" fill="#8A877D">SOUL.md · HEARTBEAT.md · memory/</text>
 </svg>

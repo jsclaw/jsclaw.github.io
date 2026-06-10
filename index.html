@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>jsclaw - Container Orchestration for Claude AI Agents</title>
-  <meta name="description" content="Lightweight container orchestration for Claude AI agents. Pure JavaScript ESM, zero dependencies.">
+  <title>jsclaw — Claude agents, each in its own container</title>
+  <meta name="description" content="Pure JavaScript container orchestration for autonomous Claude AI agents. Heartbeat, scheduler, memory, skills, channels. Zero dependencies.">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="jsclaw - Pure JS Container Orchestration for Claude AI">
-  <meta property="og:description" content="Run Claude agents in isolated Docker containers. Streaming output, filesystem IPC, MCP tools. Pure JavaScript ESM. Zero dependencies.">
+  <meta property="og:title" content="jsclaw — Claude agents, each in its own container">
+  <meta property="og:description" content="Pure JavaScript container orchestration for autonomous Claude AI agents. Heartbeat, scheduler, memory, skills, channels. Zero dependencies.">
   <meta property="og:image" content="https://jsclaw.dev/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -18,683 +18,893 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="jsclaw - Pure JS Container Orchestration for Claude AI">
-  <meta name="twitter:description" content="Run Claude agents in isolated Docker containers. Pure JavaScript ESM. Zero dependencies.">
+  <meta name="twitter:title" content="jsclaw — Claude agents, each in its own container">
+  <meta name="twitter:description" content="Pure JavaScript container orchestration for autonomous Claude AI agents. Zero dependencies.">
   <meta name="twitter:image" content="https://jsclaw.dev/og-image.png">
 
-  <!-- Additional SEO -->
   <link rel="canonical" href="https://jsclaw.dev">
-  <meta name="theme-color" content="#2563eb">
-
+  <meta name="theme-color" content="#FAF9F5">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #ffffff;
-      --bg-alt: #f8f9fb;
-      --bg-code: #f1f3f7;
-      --text: #1a1a2e;
-      --text-secondary: #555770;
-      --accent: #2563eb;
-      --accent-light: #dbeafe;
-      --green: #059669;
-      --green-light: #d1fae5;
-      --border: #e2e5ea;
-      --radius: 10px;
-      --max-w: 1080px;
+      --cream: #FAF9F5;
+      --cream-2: #F0EEE6;
+      --cream-3: #E8E5DA;
+      --ink: #161614;
+      --muted: #63615C;
+      --faint: #8A877D;
+      --line: #E5E2D9;
+      --terra: #C15F3C;
+      --terra-dark: #9E4B2D;
+      --terra-soft: #F3E5DD;
+      --sage: #7D9B76;
+      --code-bg: #24231F;
+      --code-line: #38362F;
+      --code-text: #ECEAE2;
+      --c-kw: #E89B7D;
+      --c-str: #B5C9A2;
+      --c-fn: #E0C580;
+      --c-prop: #C9B8E8;
+      --c-cm: #908D82;
+      --radius: 12px;
+      --max-w: 1120px;
+      --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
+      font-family: var(--sans);
+      font-size: 16px;
+      color: var(--ink);
+      background: var(--cream);
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    code, pre, .mono {
-      font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+    ::selection { background: var(--terra-soft); color: var(--terra-dark); }
+
+    a { color: inherit; text-decoration: none; }
+    code, pre, .mono { font-family: var(--mono); }
+
+    .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 28px; }
+
+    /* ---------- Reveal animation ---------- */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.2,.6,.2,1), transform .7s cubic-bezier(.2,.6,.2,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
     }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* --- NAV --- */
+    /* ---------- Nav ---------- */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      background: rgba(250, 249, 245, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
     }
     nav .inner {
       max-width: var(--max-w); margin: 0 auto;
-      padding: 0 24px; height: 56px;
+      padding: 0 28px; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    nav .logo {
-      font-weight: 700; font-size: 1.15rem; color: var(--text);
-      display: flex; align-items: center; gap: 8px;
+    .logo {
+      display: flex; align-items: baseline; gap: 9px;
+      font-weight: 600; font-size: 1.2rem; letter-spacing: -0.01em;
     }
-    nav .logo span { color: var(--accent); }
-    nav .links { display: flex; gap: 24px; font-size: 0.9rem; }
-    nav .links a { color: var(--text-secondary); font-weight: 500; }
-    nav .links a:hover { color: var(--accent); text-decoration: none; }
-    .badge-row { display: flex; gap: 6px; }
-    .badge-row img { height: 20px; }
+    .logo .mark { font-family: var(--mono); font-weight: 500; color: var(--terra); font-size: 1.05rem; }
+    nav .links { display: flex; align-items: center; gap: 28px; font-size: 0.88rem; font-weight: 500; }
+    nav .links a { color: var(--muted); transition: color .15s; }
+    nav .links a:hover { color: var(--ink); }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 14px; border: 1px solid var(--line);
+      border-radius: 100px; color: var(--ink) !important;
+      transition: border-color .15s, background .15s;
+    }
+    .nav-gh:hover { border-color: var(--ink); background: var(--cream-2); }
+    .nav-gh svg { width: 15px; height: 15px; }
 
-    /* --- HERO --- */
-    .hero {
-      padding: 80px 24px 64px;
-      text-align: center;
-      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+    /* ---------- Hero ---------- */
+    .hero { padding: 104px 0 88px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 720px 420px at 50% -10%, rgba(193, 95, 60, 0.07), transparent 70%);
     }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em;
+      color: var(--terra-dark);
+      background: var(--terra-soft);
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 30px;
+    }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--terra); }
     .hero h1 {
-      font-size: clamp(2.4rem, 5vw, 3.5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.022em;
+      max-width: 820px;
+      margin: 0 auto 26px;
     }
-    .hero h1 .highlight { color: var(--accent); }
-    .hero .tagline {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      max-width: 560px;
-      margin: 0 auto 32px;
+    .hero h1 em {
+      font-style: italic;
+      color: var(--terra);
     }
-
-    .install-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--text);
-      color: #e2e8f0;
-      padding: 14px 20px;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      position: relative;
-    }
-    .install-box:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    }
-    .install-box .dollar { color: var(--green); user-select: none; }
-    .install-box .cmd { user-select: all; }
-    .install-box .copy-btn {
-      background: none; border: none; color: #94a3b8;
-      cursor: pointer; padding: 2px; font-size: 0.85rem;
-      transition: color 0.15s;
-    }
-    .install-box .copy-btn:hover { color: #fff; }
-    .install-box .tooltip {
-      position: absolute; top: -32px; right: 8px;
-      background: var(--green); color: white;
-      padding: 4px 10px; border-radius: 6px;
-      font-size: 0.75rem; opacity: 0;
-      transition: opacity 0.2s; pointer-events: none;
-    }
-    .install-box .tooltip.show { opacity: 1; }
-
-    .hero-links {
-      margin-top: 20px;
-      display: flex; gap: 16px; justify-content: center;
-      font-size: 0.9rem;
-    }
-    .hero-links a {
-      color: var(--text-secondary);
-      display: flex; align-items: center; gap: 4px;
+    .hero .sub {
+      font-size: 1.16rem; color: var(--muted);
+      max-width: 600px; margin: 0 auto 42px;
+      line-height: 1.6;
     }
 
-    /* --- SECTION --- */
-    section { padding: 72px 24px; }
-    section.alt { background: var(--bg-alt); }
-    .section-inner { max-width: var(--max-w); margin: 0 auto; }
-    .section-title {
-      font-size: 1.75rem; font-weight: 700;
-      margin-bottom: 8px; letter-spacing: -0.02em;
+    .install-row { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; }
+    .install-pill {
+      display: inline-flex; align-items: center; gap: 14px;
+      background: var(--code-bg); color: var(--code-text);
+      font-family: var(--mono); font-size: 0.95rem;
+      padding: 15px 22px; border-radius: 100px;
+      cursor: pointer; position: relative;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 1px 2px rgba(22,22,20,.08), 0 8px 28px rgba(22,22,20,.10);
     }
-    .section-subtitle {
-      color: var(--text-secondary); margin-bottom: 40px;
-      font-size: 1.05rem;
+    .install-pill:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(22,22,20,.08), 0 14px 36px rgba(22,22,20,.14); }
+    .install-pill .ps1 { color: var(--sage); user-select: none; }
+    .install-pill .copy { display: inline-flex; color: var(--faint); transition: color .15s; }
+    .install-pill:hover .copy { color: var(--code-text); }
+    .install-pill .tip {
+      position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--cream);
+      font-family: var(--sans); font-size: 0.75rem; font-weight: 600;
+      padding: 5px 12px; border-radius: 7px;
+      opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap;
     }
+    .install-pill .tip.show { opacity: 1; }
+    .cta-secondary {
+      font-size: 0.95rem; font-weight: 600; color: var(--ink);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 14px 8px;
+    }
+    .cta-secondary .arr { transition: transform .15s; color: var(--terra); }
+    .cta-secondary:hover .arr { transform: translateX(3px); }
 
-    /* --- FEATURES --- */
-    .features-grid {
+    .stats {
+      display: flex; justify-content: center; gap: 0;
+      margin-top: 64px; flex-wrap: wrap;
+    }
+    .stat {
+      padding: 0 36px; text-align: center;
+      border-left: 1px solid var(--line);
+    }
+    .stat:first-child { border-left: none; }
+    .stat .n { font-family: var(--serif); font-size: 1.9rem; font-weight: 500; letter-spacing: -0.02em; }
+    .stat .l { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); margin-top: 2px; }
+
+    /* ---------- Sections ---------- */
+    section { padding: 96px 0; }
+    section.alt { background: var(--cream-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .sec-head { max-width: 640px; margin-bottom: 56px; }
+    .sec-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+    .kicker {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--terra);
+      margin-bottom: 14px;
+    }
+    .sec-head h2 {
+      font-family: var(--serif); font-weight: 500;
+      font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+      line-height: 1.15; letter-spacing: -0.018em;
+      margin-bottom: 14px;
+    }
+    .sec-head p { color: var(--muted); font-size: 1.05rem; }
+    .sec-head a { color: var(--terra-dark); border-bottom: 1px solid var(--terra-soft); }
+
+    /* ---------- Features ---------- */
+    .feat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 14px;
     }
-    .feature-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
+    .feat {
+      background: var(--cream);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 28px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 30px 28px;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
     }
-    .feature-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.08);
+    .feat:hover {
+      border-color: #D8D4C8;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(22,22,20,.06);
     }
-    .feature-icon {
-      width: 40px; height: 40px;
-      background: var(--accent-light);
-      border-radius: 8px;
+    .feat .icon {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: var(--terra-soft); color: var(--terra-dark);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; margin-bottom: 14px;
+      margin-bottom: 18px;
     }
-    .feature-card h3 { font-size: 1.05rem; font-weight: 650; margin-bottom: 6px; }
-    .feature-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.55; }
+    .feat .icon svg { width: 19px; height: 19px; }
+    .feat h3 { font-size: 1.02rem; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 7px; }
+    .feat p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+    .feat code {
+      font-size: 0.8rem; background: var(--cream-2);
+      border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px;
+      color: var(--terra-dark);
+    }
 
-    /* --- CODE --- */
-    .code-block {
-      background: var(--text);
-      color: #e2e8f0;
-      border-radius: var(--radius);
-      padding: 28px;
+    /* ---------- Architecture ---------- */
+    .arch-card {
+      background: var(--cream);
+      border: 1px solid var(--line); border-radius: 16px;
+      padding: 44px 24px; display: flex; justify-content: center;
       overflow-x: auto;
-      font-size: 0.88rem;
-      line-height: 1.7;
     }
-    .code-block .kw { color: #c084fc; }
-    .code-block .str { color: #86efac; }
-    .code-block .fn { color: #93c5fd; }
-    .code-block .cm { color: #64748b; }
-    .code-block .num { color: #fbbf24; }
-    .code-block .prop { color: #f0abfc; }
+    .arch-card svg { max-width: 100%; height: auto; }
 
+    /* ---------- Code tabs ---------- */
+    .code-shell {
+      background: var(--code-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(22,22,20,.1), 0 24px 64px rgba(22,22,20,.16);
+    }
     .code-tabs {
-      display: flex; gap: 0; margin-bottom: -1px; position: relative; z-index: 1;
+      display: flex; gap: 2px; padding: 10px 14px 0;
+      background: #2D2B26;
+      overflow-x: auto;
     }
     .code-tab {
-      padding: 8px 18px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: var(--bg-code);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      border-radius: var(--radius) var(--radius) 0 0;
-      cursor: pointer;
+      font-family: var(--mono); font-size: 0.8rem;
+      color: var(--faint);
+      padding: 10px 18px; cursor: pointer;
+      border-radius: 9px 9px 0 0;
+      white-space: nowrap;
+      transition: color .15s, background .15s;
+      border: none; background: transparent;
     }
-    .code-tab.active {
-      color: var(--text);
-      background: var(--text);
-      color: #e2e8f0;
-      border-color: var(--text);
+    .code-tab:hover { color: var(--code-text); }
+    .code-tab.active { background: var(--code-bg); color: var(--c-fn); }
+    .code-pane { display: none; padding: 28px 30px; overflow-x: auto; }
+    .code-pane.active { display: block; }
+    .code-pane pre {
+      font-family: var(--mono); font-size: 0.86rem; line-height: 1.75;
+      color: var(--code-text);
+    }
+    .kw { color: var(--c-kw); }
+    .str { color: var(--c-str); }
+    .fn { color: var(--c-fn); }
+    .prop { color: var(--c-prop); }
+    .cm { color: var(--c-cm); font-style: italic; }
+
+    /* ---------- Files (SOUL / HEARTBEAT) ---------- */
+    .files-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+    }
+    @media (max-width: 820px) { .files-grid { grid-template-columns: 1fr; } }
+    .file-card {
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(22,22,20,.04);
+    }
+    .file-card .bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--cream-2);
+    }
+    .file-card .bar .fname { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; }
+    .file-card .bar .ftag {
+      margin-left: auto; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--terra-dark); background: var(--terra-soft);
+      padding: 3px 10px; border-radius: 100px;
+    }
+    .file-card .doc {
+      padding: 24px 26px; font-size: 0.9rem; line-height: 1.7; color: var(--muted);
+    }
+    .file-card .doc h4 {
+      font-family: var(--serif); font-size: 1.22rem; font-weight: 600;
+      color: var(--ink); margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+    .file-card .doc h5 {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--faint);
+      margin: 18px 0 6px;
+    }
+    .file-card .doc h5:first-child { margin-top: 0; }
+    .file-card .doc ul { list-style: none; }
+    .file-card .doc li { padding-left: 18px; position: relative; margin-bottom: 4px; }
+    .file-card .doc li::before {
+      content: '–'; position: absolute; left: 0; color: var(--terra);
     }
 
-    /* --- ARCH --- */
-    .arch-svg-wrap {
-      background: var(--bg-code);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px 16px;
-      display: flex;
-      justify-content: center;
+    /* ---------- Terminal ---------- */
+    .term {
+      background: var(--code-bg); border-radius: 16px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(22,22,20,.1), 0 24px 64px rgba(22,22,20,.16);
+    }
+    .term .bar {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 18px; background: #2D2B26;
+    }
+    .term .bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+    .term .bar i:nth-child(1) { background: #E0654F; }
+    .term .bar i:nth-child(2) { background: #E0A33E; }
+    .term .bar i:nth-child(3) { background: #7DA763; }
+    .term .bar span {
+      margin-left: 10px; font-family: var(--mono);
+      font-size: 0.75rem; color: var(--faint);
+    }
+    .term .body {
+      padding: 26px 28px; font-family: var(--mono);
+      font-size: 0.85rem; line-height: 1.85; color: var(--code-text);
       overflow-x: auto;
     }
-    .arch-svg-wrap svg { max-width: 100%; height: auto; }
+    .term .ps { color: var(--sage); }
+    .term .dim { color: var(--c-cm); }
+    .term .hi { color: var(--c-fn); }
+    .term .ok { color: var(--c-str); }
 
-    /* --- API TABLE --- */
-    .api-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
+    /* ---------- Compare ---------- */
+    .compare-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--cream); }
+    table.compare {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 640px;
     }
-    .api-table th {
-      text-align: left;
-      padding: 12px 16px;
-      background: var(--bg-code);
-      border-bottom: 2px solid var(--border);
-      font-weight: 650;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-secondary);
+    .compare th, .compare td { padding: 15px 22px; text-align: left; }
+    .compare thead th {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--faint); border-bottom: 1px solid var(--line);
+      background: var(--cream-2);
     }
-    .api-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-    .api-table code {
-      background: var(--bg-code);
-      padding: 2px 7px;
-      border-radius: 5px;
-      font-size: 0.85rem;
-      color: var(--accent);
-    }
+    .compare thead th.hl { color: var(--terra-dark); }
+    .compare tbody td { border-bottom: 1px solid var(--line); color: var(--muted); }
+    .compare tbody tr:last-child td { border-bottom: none; }
+    .compare tbody td:first-child { font-weight: 600; color: var(--ink); }
+    .compare td.hl { background: rgba(193, 95, 60, 0.045); color: var(--ink); font-weight: 500; }
+    .compare .y { color: var(--sage); font-weight: 700; }
+    .compare .n2 { color: var(--faint); }
 
-    /* --- FOOTER --- */
-    footer {
-      padding: 40px 24px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
+    /* ---------- Module map ---------- */
+    .mod-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;
     }
-    footer .links { display: flex; gap: 24px; justify-content: center; margin-bottom: 12px; }
+    .mod {
+      display: block;
+      background: var(--cream); border: 1px solid var(--line);
+      border-radius: 10px; padding: 16px 18px;
+      transition: border-color .15s, background .15s;
+    }
+    .mod:hover { border-color: var(--terra); }
+    .mod .p { font-family: var(--mono); font-size: 0.8rem; font-weight: 500; color: var(--terra-dark); }
+    .mod .d { font-size: 0.82rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
 
-    /* --- RESPONSIVE --- */
-    @media (max-width: 640px) {
-      .hero { padding: 56px 20px 48px; }
-      section { padding: 48px 20px; }
-      .features-grid { grid-template-columns: 1fr; }
-      nav .links { gap: 14px; font-size: 0.82rem; }
-      .install-box { font-size: 0.9rem; padding: 12px 16px; }
+    /* ---------- CTA ---------- */
+    .cta {
+      text-align: center; padding: 110px 0;
+      position: relative; overflow: hidden;
+    }
+    .cta::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 640px 360px at 50% 110%, rgba(193, 95, 60, 0.08), transparent 70%);
+    }
+    .cta h2 {
+      font-family: var(--serif); font-weight: 500;
+      font-size: clamp(2rem, 4.4vw, 3.2rem);
+      letter-spacing: -0.02em; line-height: 1.12;
+      max-width: 640px; margin: 0 auto 18px;
+    }
+    .cta h2 em { font-style: italic; color: var(--terra); }
+    .cta p { color: var(--muted); font-size: 1.05rem; margin-bottom: 38px; }
+
+    /* ---------- Footer ---------- */
+    footer { border-top: 1px solid var(--line); padding: 56px 0 48px; background: var(--cream-2); }
+    .foot-grid {
+      display: flex; justify-content: space-between; gap: 48px; flex-wrap: wrap;
+    }
+    .foot-brand { max-width: 320px; }
+    .foot-brand .logo { margin-bottom: 12px; }
+    .foot-brand p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+    .foot-cols { display: flex; gap: 72px; flex-wrap: wrap; }
+    .foot-col h4 {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--faint); margin-bottom: 14px;
+    }
+    .foot-col a {
+      display: block; font-size: 0.88rem; color: var(--muted);
+      margin-bottom: 9px; transition: color .15s;
+    }
+    .foot-col a:hover { color: var(--terra-dark); }
+    .foot-base {
+      margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      font-size: 0.8rem; color: var(--faint);
+    }
+    .foot-base a { color: var(--muted); }
+    .foot-base a:hover { color: var(--terra-dark); }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 720px) {
+      .hero { padding: 72px 0 60px; }
+      section { padding: 64px 0; }
+      nav .links a:not(.nav-gh) { display: none; }
+      .stat { padding: 0 20px; }
+      .stat .n { font-size: 1.5rem; }
+      .code-pane { padding: 20px 18px; }
+      .term .body { padding: 20px 18px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="inner">
-      <div class="logo"><span>&gt;_</span> jsclaw</div>
-      <div class="links">
-        <a href="#features">Features</a>
-        <a href="#quickstart">Quick Start</a>
-        <a href="#api">API</a>
-        <a href="#examples">Examples</a>
-        <a href="https://github.com/jsclaw/jsclaw">GitHub</a>
-        <a href="https://www.npmjs.com/package/jsclaw">npm</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="badge-row" style="justify-content:center; margin-bottom: 20px;">
-      <img src="https://img.shields.io/npm/v/jsclaw?color=2563eb&label=npm" alt="npm version">
-      <img src="https://img.shields.io/badge/pure_JS-ESM-f7df1e?logo=javascript&logoColor=000" alt="Pure JavaScript ESM">
-      <img src="https://img.shields.io/badge/deps-0-059669" alt="zero dependencies">
-      <img src="https://img.shields.io/badge/license-MIT-059669" alt="MIT license">
-    </div>
-    <h1>Pure <span class="highlight">JavaScript</span> container<br>orchestration for Claude AI agents</h1>
-    <p class="tagline">
-      Run Claude agents in isolated Docker containers with streaming output,
-      filesystem IPC, and built-in MCP tools. Plain .js files. No build step. Zero dependencies.
-    </p>
-    <div class="install-box" onclick="copyInstall(this)">
-      <span class="dollar">$</span>
-      <span class="cmd">npm install jsclaw</span>
-      <button class="copy-btn" aria-label="Copy">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </button>
-      <span class="tooltip">Copied!</span>
-    </div>
-    <div class="hero-links">
-      <a href="https://github.com/jsclaw/jsclaw">View on GitHub &rarr;</a>
-      <a href="https://github.com/qwibitai/nanoclaw">Based on nanoclaw</a>
+<nav>
+  <div class="inner">
+    <a class="logo" href="#"><span class="mark">&gt;_</span> jsclaw</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#code">Quick start</a>
+      <a href="#cli">CLI</a>
+      <a href="#modules">API</a>
+      <a class="nav-gh" href="https://github.com/jsclaw/jsclaw">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
     </div>
   </div>
+</nav>
 
-  <!-- FEATURES -->
-  <section class="alt" id="features">
-    <div class="section-inner">
-      <h2 class="section-title">What's inside</h2>
-      <p class="section-subtitle">The core primitives you need to orchestrate Claude agents in containers.</p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">&#x1F4E6;</div>
-          <h3>Container Runner</h3>
-          <p>Spawn Docker, Podman, or Apple containers. Stream agent output in real-time via sentinel-delimited JSON over stdout.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#x1F4C1;</div>
-          <h3>Filesystem IPC</h3>
-          <p>Atomic JSON file-based communication between host and container. No sockets, no ports&mdash;just files. Simple and reliable.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#x2699;</div>
-          <h3>Group Queue</h3>
-          <p>Per-group concurrency with configurable global limits. Exponential backoff retry. One container per group, up to N in parallel.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#x1F527;</div>
-          <h3>MCP Tools</h3>
-          <p>Built-in MCP server exposes <code>send_message</code>, <code>schedule_task</code>, and task lifecycle tools to the agent inside the container.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#x1F512;</div>
-          <h3>Mount Security</h3>
-          <p>Allowlist-based volume mount validation. Blocks sensitive paths (.ssh, .env, credentials) by default. Symlink-aware.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#x26A1;</div>
-          <h3>Zero Dependencies</h3>
-          <p>The host side uses only Node.js built-ins. No native modules, no build step. Pure JavaScript ESM that just works.</p>
-        </div>
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> v0.0.5 · Pure JavaScript ESM · MIT</div>
+    <h1>Claude agents,<br>each in <em>its own container</em>.</h1>
+    <p class="sub">
+      jsclaw is the lightweight orchestration engine for autonomous Claude AI agents —
+      isolated in Docker, woken by heartbeats, remembering in Markdown. Zero dependencies.
+    </p>
+    <div class="install-row">
+      <div class="install-pill" onclick="copyInstall(this)">
+        <span class="ps1">$</span>
+        <span>npm install jsclaw</span>
+        <span class="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+        <span class="tip">Copied</span>
+      </div>
+      <a class="cta-secondary" href="https://github.com/jsclaw/jsclaw#readme">Read the docs <span class="arr">→</span></a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">0</div><div class="l">Dependencies</div></div>
+      <div class="stat"><div class="n">~40 kB</div><div class="l">Installed</div></div>
+      <div class="stat"><div class="n">63</div><div class="l">Tests passing</div></div>
+      <div class="stat"><div class="n">12</div><div class="l">Modules</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= FEATURES ================= -->
+<section class="alt" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Capabilities</div>
+      <h2>Everything an agent needs.<br>Nothing your bundler doesn't.</h2>
+      <p>The host side is built entirely on Node.js built-ins — no native modules, no build step, no supply chain. You bring the I/O and storage; jsclaw brings the engine.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg></div>
+        <h3>Container isolation by design</h3>
+        <p>Every agent runs in its own Docker, Podman, or Apple container with an isolated filesystem. Not an optional sandbox — the architecture.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>Heartbeat autonomy</h3>
+        <p>Agents wake on an interval, read their <code>HEARTBEAT.md</code>, act if anything needs attention — and stay silent when it doesn't. Quiet hours included.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>Scheduler with zero-dep cron</h3>
+        <p>Cron, interval, and one-shot tasks — including a full 5-field cron parser in plain JavaScript. Agents schedule their own follow-ups.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <h3>Souls &amp; identity</h3>
+        <p>openclaw's identity stack — <code>SOUL.md</code>, <code>IDENTITY.md</code>, <code>AGENTS.md</code>, <code>TOOLS.md</code>, <code>USER.md</code> — loaded into the system prompt in order.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <h3>Memory in Markdown</h3>
+        <p>Persistent context as plain files the agent edits itself — <code>preferences.md</code>, <code>projects.md</code>, custom categories. Human-readable, git-diffable.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg></div>
+        <h3>Skills</h3>
+        <p>Teach capabilities with <code>SKILL.md</code> files — YAML frontmatter, keyword / regex / attachment triggers, instructions injected only when they fire.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Pluggable channels</h3>
+        <p>One small interface — <code>connect</code>, <code>sendMessage</code>, <code>ownsJid</code> — and the manager routes outbound messages to the right platform automatically.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h3>Webhooks, both ways</h3>
+        <p>Ingress with <code>{{body.field}}</code> templates and secret auth; egress on events like <code>agent.task.completed</code>. CI, Slack, PagerDuty, home automation.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>Mount security</h3>
+        <p>Allowlist-validated volume mounts with symlink resolution. <code>.ssh</code>, <code>.aws</code>, <code>.env</code> and friends are blocked by default, always.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- QUICK START -->
-  <section id="quickstart">
-    <div class="section-inner">
-      <h2 class="section-title">Quick start</h2>
-      <p class="section-subtitle">Install, configure, run. Plain JavaScript &mdash; no compilation, no transpilation.</p>
+<!-- ================= HOW IT WORKS ================= -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Architecture</div>
+      <h2>A host process, a container,<br>and files between them.</h2>
+      <p>Input goes in over stdin; results stream back as sentinel-delimited JSON. Everything else — messages, tasks, follow-ups — is atomic JSON files on a shared mount. No sockets to secure, no ports to leak.</p>
+    </div>
+    <div class="arch-card reveal">
+      <svg viewBox="0 0 840 412" width="840" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, sans-serif">
+        <rect x="24" y="46" width="340" height="252" rx="14" fill="#FAF9F5" stroke="#E5E2D9" stroke-width="1.5"/>
+        <text x="194" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#C15F3C" letter-spacing="1.5">HOST · YOUR APP</text>
+        <rect x="44" y="70" width="300" height="46" rx="9" fill="#F3E5DD"/>
+        <text x="194" y="89" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">container-runner</text>
+        <text x="194" y="105" text-anchor="middle" font-size="10.5" fill="#63615C">spawns &amp; streams</text>
+        <rect x="44" y="128" width="300" height="46" rx="9" fill="#F3E5DD"/>
+        <text x="194" y="147" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">scheduler · heartbeat</text>
+        <text x="194" y="163" text-anchor="middle" font-size="10.5" fill="#63615C">cron, intervals, wake-ups</text>
+        <rect x="44" y="186" width="300" height="46" rx="9" fill="#F3E5DD"/>
+        <text x="194" y="205" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">ipc · queue · channels</text>
+        <text x="194" y="221" text-anchor="middle" font-size="10.5" fill="#63615C">routing &amp; concurrency</text>
+        <rect x="44" y="244" width="300" height="38" rx="9" fill="#F0EEE6"/>
+        <text x="194" y="267" text-anchor="middle" font-size="11.5" font-weight="500" fill="#63615C" font-family="JetBrains Mono, monospace">skills · memory · webhooks</text>
 
-      <div style="margin-bottom: 24px;">
-        <div class="code-tabs">
-          <div class="code-tab active">run-agent.js</div>
-        </div>
-        <div class="code-block"><pre><span class="kw">import</span> { <span class="fn">runContainerAgent</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
+        <rect x="476" y="46" width="340" height="252" rx="14" fill="#FAF9F5" stroke="#E5E2D9" stroke-width="1.5"/>
+        <text x="646" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#7D9B76" letter-spacing="1.5">CONTAINER · ISOLATED</text>
+        <rect x="496" y="70" width="300" height="46" rx="9" fill="#E9EFE4"/>
+        <text x="646" y="89" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">agent-runner</text>
+        <text x="646" y="105" text-anchor="middle" font-size="10.5" fill="#63615C">drives the Claude SDK</text>
+        <rect x="496" y="128" width="300" height="46" rx="9" fill="#E9EFE4"/>
+        <text x="646" y="147" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">mcp-server</text>
+        <text x="646" y="163" text-anchor="middle" font-size="10.5" fill="#63615C">send_message · schedule_task</text>
+        <rect x="496" y="186" width="300" height="46" rx="9" fill="#F0EEE6"/>
+        <text x="646" y="205" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">/workspace/group</text>
+        <text x="646" y="221" text-anchor="middle" font-size="10.5" fill="#63615C">SOUL.md · memory/ · HEARTBEAT.md</text>
+        <rect x="496" y="244" width="300" height="38" rx="9" fill="#F0EEE6"/>
+        <text x="646" y="267" text-anchor="middle" font-size="11.5" font-weight="500" fill="#63615C" font-family="JetBrains Mono, monospace">isolated filesystem, own cwd</text>
+
+        <defs>
+          <marker id="at" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7" fill="#C15F3C"/></marker>
+          <marker id="ag" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7" fill="#7D9B76"/></marker>
+        </defs>
+        <line x1="368" y1="88" x2="470" y2="88" stroke="#C15F3C" stroke-width="1.8" marker-end="url(#at)" stroke-dasharray="5,4"/>
+        <text x="419" y="78" text-anchor="middle" font-size="10.5" font-weight="600" fill="#C15F3C" font-family="JetBrains Mono, monospace">stdin</text>
+        <line x1="470" y1="118" x2="368" y2="118" stroke="#7D9B76" stroke-width="1.8" marker-end="url(#ag)" stroke-dasharray="5,4"/>
+        <text x="419" y="136" text-anchor="middle" font-size="10.5" font-weight="600" fill="#7D9B76" font-family="JetBrains Mono, monospace">stdout</text>
+        <line x1="368" y1="196" x2="470" y2="196" stroke="#C15F3C" stroke-width="1.8" marker-end="url(#at)" stroke-dasharray="5,4"/>
+        <line x1="470" y1="226" x2="368" y2="226" stroke="#7D9B76" stroke-width="1.8" marker-end="url(#ag)" stroke-dasharray="5,4"/>
+        <text x="419" y="214" text-anchor="middle" font-size="10.5" font-weight="600" fill="#63615C" font-family="JetBrains Mono, monospace">ipc files</text>
+
+        <line x1="194" y1="298" x2="194" y2="330" stroke="#E5E2D9" stroke-width="1.5"/>
+        <line x1="646" y1="298" x2="646" y2="330" stroke="#E5E2D9" stroke-width="1.5"/>
+        <rect x="94" y="334" width="200" height="52" rx="10" fill="#F0EEE6" stroke="#E5E2D9"/>
+        <text x="194" y="356" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9E4B2D" font-family="JetBrains Mono, monospace">data/ipc/{group}/</text>
+        <text x="194" y="373" text-anchor="middle" font-size="10.5" fill="#63615C" font-family="JetBrains Mono, monospace">messages/ tasks/ input/</text>
+        <rect x="546" y="334" width="200" height="52" rx="10" fill="#F0EEE6" stroke="#E5E2D9"/>
+        <text x="646" y="356" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9E4B2D" font-family="JetBrains Mono, monospace">/workspace/ipc/</text>
+        <text x="646" y="373" text-anchor="middle" font-size="10.5" fill="#63615C" font-family="JetBrains Mono, monospace">messages/ tasks/ input/</text>
+        <line x1="294" y1="360" x2="546" y2="360" stroke="#E5E2D9" stroke-width="1.5" stroke-dasharray="3,4"/>
+        <text x="420" y="352" text-anchor="middle" font-size="10" fill="#8A877D">same directory, two views</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CODE ================= -->
+<section class="alt" id="code">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Quick start</div>
+      <h2>From <span class="mono" style="font-size:0.78em">npm install</span> to an agent with a pulse.</h2>
+      <p>Plain JavaScript, granular imports, no compilation. These four snippets are the whole learning curve.</p>
+    </div>
+    <div class="code-shell reveal">
+      <div class="code-tabs" role="tablist">
+        <button class="code-tab active" onclick="showTab(this, 'tab-run')">run-agent.js</button>
+        <button class="code-tab" onclick="showTab(this, 'tab-auto')">autonomy.js</button>
+        <button class="code-tab" onclick="showTab(this, 'tab-skill')">deploy.skill.md</button>
+        <button class="code-tab" onclick="showTab(this, 'tab-chan')">channels.js</button>
+      </div>
+      <div class="code-panes">
+        <div class="code-pane active" id="tab-run"><pre><span class="kw">import</span> { <span class="fn">runContainerAgent</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
 
 <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runContainerAgent</span>(
-  { <span class="prop">name</span>: <span class="str">'my-agent'</span>, <span class="prop">folder</span>: <span class="str">'my-agent'</span> },
-  { <span class="prop">prompt</span>: <span class="str">'Analyze the codebase and suggest improvements.'</span>,
-    <span class="prop">groupFolder</span>: <span class="str">'my-agent'</span>, <span class="prop">chatJid</span>: <span class="str">'user-1'</span>, <span class="prop">isMain</span>: <span class="num">true</span> },
-  (proc, name) =&gt; console.<span class="fn">log</span>(<span class="str">`Started</span> <span class="str">${name}`</span>),
-  <span class="kw">async</span> (output) =&gt; console.<span class="fn">log</span>(output.result),
+  { <span class="prop">name</span>: <span class="str">'main'</span>, <span class="prop">folder</span>: <span class="str">'main'</span> },
+  { <span class="prop">prompt</span>: <span class="str">'Summarize the repos in my workspace.'</span>,
+    <span class="prop">groupFolder</span>: <span class="str">'main'</span>, <span class="prop">chatJid</span>: <span class="str">'user-1'</span>, <span class="prop">isMain</span>: <span class="kw">true</span> },
+  <span class="kw">null</span>,
+  <span class="kw">async</span> (output) =&gt; console.<span class="fn">log</span>(output.result),  <span class="cm">// streams as it works</span>
+  <span class="fn">createConfig</span>(),
 );</pre></div>
+        <div class="code-pane" id="tab-auto"><pre><span class="kw">import</span> { <span class="fn">TaskStore</span>, <span class="fn">createTaskIpcHandler</span>, <span class="fn">startTaskScheduler</span>,
+         <span class="fn">startHeartbeat</span>, <span class="fn">startIpcWatcher</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
+
+<span class="kw">const</span> config = <span class="fn">createConfig</span>();
+<span class="kw">const</span> store  = <span class="kw">new</span> <span class="fn">TaskStore</span>(config);
+
+<span class="cm">// Agents schedule their own work via the schedule_task MCP tool…</span>
+<span class="fn">startIpcWatcher</span>({ <span class="prop">onTask</span>: <span class="fn">createTaskIpcHandler</span>(store), <span class="cm">/* … */</span> }, config);
+
+<span class="cm">// …the scheduler fires them (cron / interval / once)…</span>
+<span class="fn">startTaskScheduler</span>({ store, <span class="prop">runTask</span>: runAgentForTask }, config);
+
+<span class="cm">// …and the heartbeat wakes each group to check HEARTBEAT.md.</span>
+<span class="fn">startHeartbeat</span>({ <span class="prop">getGroups</span>: () =&gt; groups, <span class="prop">runAgent</span>, <span class="prop">onAlert</span> },
+  config, { <span class="prop">quietHours</span>: { <span class="prop">start</span>: <span class="str">'22:00'</span>, <span class="prop">end</span>: <span class="str">'07:00'</span> } });</pre></div>
+        <div class="code-pane" id="tab-skill"><pre><span class="cm">---</span>
+<span class="prop">name</span>: <span class="str">deploy-helper</span>
+<span class="prop">description</span>: <span class="str">"Helps with deployments"</span>
+<span class="prop">trigger</span>: <span class="str">"deploy|ship|push to prod"</span>
+<span class="prop">tools</span>: [<span class="str">shell</span>, <span class="str">http</span>]
+<span class="cm">---</span>
+<span class="fn"># Deploy Helper</span>
+
+When asked to deploy:
+1. Run the test suite first — abort on failure
+2. Tag the release and push the tag
+3. Report what shipped, in one line
+
+<span class="cm"># jsclaw skill install ./deploy.skill.md</span>
+<span class="cm"># injected only when a message mentions deploy / ship</span></pre></div>
+        <div class="code-pane" id="tab-chan"><pre><span class="kw">import</span> { <span class="fn">ChannelManager</span>, <span class="fn">startIpcWatcher</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
+
+<span class="kw">const</span> channels = <span class="kw">new</span> <span class="fn">ChannelManager</span>();
+channels.<span class="fn">register</span>(telegramChannel);   <span class="cm">// any object with the</span>
+channels.<span class="fn">register</span>(discordChannel);    <span class="cm">// Channel interface</span>
+
+<span class="kw">await</span> channels.<span class="fn">connectAll</span>();
+
+<span class="cm">// Outbound routing by JID — agents' send_message just works</span>
+<span class="fn">startIpcWatcher</span>({
+  <span class="prop">sendMessage</span>: channels.sendMessage,
+  <span class="cm">/* onTask, getRegisteredGroups */</span>
+}, <span class="fn">createConfig</span>());</pre></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ARCHITECTURE -->
-  <section class="alt">
-    <div class="section-inner">
-      <h2 class="section-title">Architecture</h2>
-      <p class="section-subtitle">Host process communicates with isolated containers via stdin/stdout and filesystem IPC.</p>
-      <div class="arch-svg-wrap">
-        <svg viewBox="0 0 820 400" width="820" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
-          <!-- Host box -->
-          <rect x="20" y="40" width="340" height="260" rx="12" fill="#ffffff" stroke="#e2e5ea" stroke-width="1.5"/>
-          <text x="190" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Host Process (your app)</text>
-          <!-- Host modules -->
-          <rect x="40" y="70" width="200" height="48" rx="8" fill="#dbeafe"/>
-          <text x="140" y="90" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">container-runner.js</text>
-          <text x="140" y="107" text-anchor="middle" font-size="11" fill="#555770">Spawns containers, streams output</text>
-
-          <rect x="40" y="138" width="200" height="48" rx="8" fill="#dbeafe"/>
-          <text x="140" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">ipc.js</text>
-          <text x="140" y="175" text-anchor="middle" font-size="11" fill="#555770">Polls IPC directories</text>
-
-          <rect x="40" y="206" width="200" height="48" rx="8" fill="#dbeafe"/>
-          <text x="140" y="226" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">group-queue.js</text>
-          <text x="140" y="243" text-anchor="middle" font-size="11" fill="#555770">Concurrency control</text>
-
-          <!-- Container box -->
-          <rect x="460" y="40" width="340" height="260" rx="12" fill="#ffffff" stroke="#e2e5ea" stroke-width="1.5"/>
-          <text x="630" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Docker Container</text>
-          <!-- Container modules -->
-          <rect x="480" y="70" width="200" height="48" rx="8" fill="#d1fae5"/>
-          <text x="580" y="90" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">agent-runner.js</text>
-          <text x="580" y="107" text-anchor="middle" font-size="11" fill="#555770">Drives Claude SDK</text>
-
-          <rect x="480" y="138" width="200" height="48" rx="8" fill="#d1fae5"/>
-          <text x="580" y="158" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">mcp-server.js</text>
-          <text x="580" y="175" text-anchor="middle" font-size="11" fill="#555770">send_message, schedule_task</text>
-
-          <rect x="480" y="206" width="200" height="48" rx="8" fill="#d1fae5"/>
-          <text x="580" y="226" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a2e">/workspace/group/</text>
-          <text x="580" y="243" text-anchor="middle" font-size="11" fill="#555770">Isolated filesystem</text>
-
-          <!-- Arrows: stdin/stdout -->
-          <defs>
-            <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2563eb"/></marker>
-            <marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#059669"/></marker>
-          </defs>
-          <!-- stdin arrow -->
-          <line x1="240" y1="86" x2="476" y2="86" stroke="#2563eb" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>
-          <rect x="330" y="74" width="58" height="20" rx="4" fill="#dbeafe"/>
-          <text x="359" y="88" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">stdin</text>
-          <!-- stdout arrow -->
-          <line x1="476" y1="102" x2="244" y2="102" stroke="#059669" stroke-width="2" marker-end="url(#ah2)" stroke-dasharray="6,3"/>
-          <rect x="326" y="93" width="66" height="20" rx="4" fill="#d1fae5"/>
-          <text x="359" y="107" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">stdout</text>
-
-          <!-- IPC arrows -->
-          <line x1="476" y1="155" x2="244" y2="155" stroke="#059669" stroke-width="2" marker-end="url(#ah2)" stroke-dasharray="6,3"/>
-          <rect x="330" y="143" width="58" height="20" rx="4" fill="#d1fae5"/>
-          <text x="359" y="157" text-anchor="middle" font-size="11" font-weight="600" fill="#059669">files</text>
-          <line x1="240" y1="172" x2="476" y2="172" stroke="#2563eb" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>
-          <rect x="330" y="163" width="58" height="20" rx="4" fill="#dbeafe"/>
-          <text x="359" y="177" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">files</text>
-
-          <!-- IPC paths at bottom -->
-          <line x1="140" y1="300" x2="140" y2="330" stroke="#e2e5ea" stroke-width="1.5"/>
-          <line x1="580" y1="300" x2="580" y2="330" stroke="#e2e5ea" stroke-width="1.5"/>
-
-          <rect x="60" y="335" width="180" height="48" rx="8" fill="#f8f9fb" stroke="#e2e5ea" stroke-width="1"/>
-          <text x="150" y="355" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">data/ipc/{group}/</text>
-          <text x="150" y="372" text-anchor="middle" font-size="11" fill="#555770">messages/ tasks/ input/</text>
-
-          <rect x="490" y="335" width="180" height="48" rx="8" fill="#f8f9fb" stroke="#e2e5ea" stroke-width="1"/>
-          <text x="580" y="355" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">/workspace/ipc/</text>
-          <text x="580" y="372" text-anchor="middle" font-size="11" fill="#555770">messages/ tasks/ input/</text>
-        </svg>
-      </div>
+<!-- ================= SOUL / HEARTBEAT ================= -->
+<section id="soul">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="kicker">Autonomy, on paper</div>
+      <h2>Two Markdown files turn a chatbot<br>into a colleague.</h2>
+      <p>Drop them in a group folder. The agent reads both — one shapes who it is, the other tells it what to watch.</p>
     </div>
-  </section>
-
-  <!-- API -->
-  <section id="api">
-    <div class="section-inner">
-      <h2 class="section-title">API Reference</h2>
-      <p class="section-subtitle">Granular ESM exports &mdash; import only what you need.</p>
-      <div style="overflow-x: auto;">
-        <table class="api-table">
-          <thead>
-            <tr>
-              <th>Export</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>createConfig(overrides?)</code></td>
-              <td>Create configuration with defaults, env vars, and overrides</td>
-            </tr>
-            <tr>
-              <td><code>runContainerAgent(group, input, ...)</code></td>
-              <td>Spawn a container, run a Claude agent, stream results</td>
-            </tr>
-            <tr>
-              <td><code>GroupQueue</code></td>
-              <td>Per-group concurrency queue with global container limit</td>
-            </tr>
-            <tr>
-              <td><code>startIpcWatcher(deps, config?)</code></td>
-              <td>Poll IPC directories for messages and task operations</td>
-            </tr>
-            <tr>
-              <td><code>writeIpcFile(dir, data)</code></td>
-              <td>Atomic JSON file write (temp + rename)</td>
-            </tr>
-            <tr>
-              <td><code>drainIpcDir(dir, filter?)</code></td>
-              <td>Read all JSON files from a directory, parse, and delete</td>
-            </tr>
-            <tr>
-              <td><code>validateAdditionalMounts(...)</code></td>
-              <td>Validate volume mounts against a security allowlist</td>
-            </tr>
-            <tr>
-              <td><code>buildVolumeMounts(group, config)</code></td>
-              <td>Build Docker volume mount arguments for a group</td>
-            </tr>
-            <tr>
-              <td><code>parseContainerOutput(buffer)</code></td>
-              <td>Parse sentinel-delimited JSON from container stdout</td>
-            </tr>
-            <tr>
-              <td><code>createLogger(options?)</code></td>
-              <td>Minimal JSON logger (no dependencies)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- MCP TOOLS -->
-  <section class="alt">
-    <div class="section-inner">
-      <h2 class="section-title">MCP Tools</h2>
-      <p class="section-subtitle">Tools available to the Claude agent inside the container via the built-in MCP server.</p>
-      <div style="overflow-x: auto;">
-        <table class="api-table">
-          <thead>
-            <tr>
-              <th>Tool</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>send_message</code></td>
-              <td>Send a message to the user or group immediately</td>
-            </tr>
-            <tr>
-              <td><code>schedule_task</code></td>
-              <td>Schedule a cron, interval, or one-shot task</td>
-            </tr>
-            <tr>
-              <td><code>list_tasks</code></td>
-              <td>List all scheduled tasks for the current group</td>
-            </tr>
-            <tr>
-              <td><code>pause_task</code></td>
-              <td>Pause a scheduled task by ID</td>
-            </tr>
-            <tr>
-              <td><code>resume_task</code></td>
-              <td>Resume a paused task by ID</td>
-            </tr>
-            <tr>
-              <td><code>cancel_task</code></td>
-              <td>Cancel and delete a scheduled task</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONFIG -->
-  <section>
-    <div class="section-inner">
-      <h2 class="section-title">Configuration</h2>
-      <p class="section-subtitle">Configure via <code>createConfig()</code> overrides or environment variables.</p>
-      <div style="overflow-x: auto;">
-        <table class="api-table">
-          <thead>
-            <tr>
-              <th>Env Variable</th>
-              <th>Default</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>JSCLAW_CONTAINER_IMAGE</code></td>
-              <td>jsclaw-agent:latest</td>
-              <td>Docker image for agent containers</td>
-            </tr>
-            <tr>
-              <td><code>JSCLAW_CONTAINER_RUNTIME</code></td>
-              <td>docker</td>
-              <td>docker, podman, or container</td>
-            </tr>
-            <tr>
-              <td><code>JSCLAW_CONTAINER_TIMEOUT</code></td>
-              <td>1800000</td>
-              <td>Idle timeout in milliseconds</td>
-            </tr>
-            <tr>
-              <td><code>JSCLAW_MAX_CONCURRENT</code></td>
-              <td>5</td>
-              <td>Maximum concurrent containers</td>
-            </tr>
-            <tr>
-              <td><code>JSCLAW_DATA_DIR</code></td>
-              <td>./data</td>
-              <td>IPC data directory</td>
-            </tr>
-            <tr>
-              <td><code>JSCLAW_GROUPS_DIR</code></td>
-              <td>./groups</td>
-              <td>Group workspace directory</td>
-            </tr>
-            <tr>
-              <td><code>ANTHROPIC_API_KEY</code></td>
-              <td>&mdash;</td>
-              <td>Required for Claude API access</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- TELEGRAM EXAMPLE -->
-  <section class="alt" id="examples">
-    <div class="section-inner">
-      <h2 class="section-title">Telegram Bot in 30 Lines</h2>
-      <p class="section-subtitle">Bring your own I/O &mdash; here's a full Telegram bot wired to jsclaw. Per-chat containers, session continuity, queue concurrency.</p>
-      <div style="margin-bottom: 24px;">
-        <div class="code-tabs">
-          <div class="code-tab active">examples/telegram.js</div>
+    <div class="files-grid">
+      <div class="file-card reveal">
+        <div class="bar">
+          <span class="fname">groups/main/SOUL.md</span>
+          <span class="ftag">identity</span>
         </div>
-        <div class="code-block"><pre><span class="kw">import</span> { <span class="fn">Bot</span> } <span class="kw">from</span> <span class="str">'grammy'</span>;
-<span class="kw">import</span> { <span class="fn">runContainerAgent</span>, <span class="fn">GroupQueue</span>, <span class="fn">createConfig</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
-
-<span class="kw">const</span> bot   = <span class="kw">new</span> <span class="fn">Bot</span>(process.env.<span class="prop">TELEGRAM_BOT_TOKEN</span>);
-<span class="kw">const</span> queue = <span class="kw">new</span> <span class="fn">GroupQueue</span>(<span class="fn">createConfig</span>());
-<span class="kw">const</span> sessions = <span class="kw">new</span> <span class="fn">Map</span>();
-
-bot.<span class="fn">on</span>(<span class="str">'message:text'</span>, <span class="kw">async</span> (ctx) =&gt; {
-  <span class="kw">const</span> id = String(ctx.chat.id);
-  <span class="kw">await</span> ctx.<span class="fn">replyWithChatAction</span>(<span class="str">'typing'</span>);
-
-  <span class="kw">await</span> queue.<span class="fn">enqueueTask</span>(id, <span class="str">`msg-${Date.now()}`</span>, <span class="kw">async</span> () =&gt; {
-    <span class="kw">await</span> <span class="fn">runContainerAgent</span>(
-      { <span class="prop">name</span>: id, <span class="prop">folder</span>: id },
-      { <span class="prop">prompt</span>: ctx.message.text, <span class="prop">groupFolder</span>: id,
-        <span class="prop">chatJid</span>: id, <span class="prop">isMain</span>: <span class="num">true</span>, <span class="prop">sessionId</span>: sessions.<span class="fn">get</span>(id) },
-      <span class="num">null</span>,
-      <span class="kw">async</span> (out) =&gt; {
-        <span class="kw">if</span> (out.result) <span class="kw">await</span> ctx.<span class="fn">reply</span>(out.result);
-        <span class="kw">if</span> (out.newSessionId) sessions.<span class="fn">set</span>(id, out.newSessionId);
-      },
-    );
-  });
-});
-
-bot.<span class="fn">start</span>();</pre></div>
+        <div class="doc">
+          <h4>You are the colleague who actually gets things done.</h4>
+          <h5>Core truths</h5>
+          <ul>
+            <li><strong>Results over process</strong> — don't explain, do.</li>
+            <li><strong>Ownership</strong> — you own it end-to-end.</li>
+          </ul>
+          <h5>Boundaries</h5>
+          <ul>
+            <li>Skip "Great question!" — just help.</li>
+            <li>If you change this file, say so.</li>
+          </ul>
+        </div>
       </div>
-      <p style="color: var(--text-secondary); font-size: 0.9rem;">
-        Full example with error handling, message splitting, and graceful shutdown:
-        <a href="https://github.com/jsclaw/jsclaw/blob/main/examples/telegram.js">examples/telegram.js</a>
-      </p>
+      <div class="file-card reveal">
+        <div class="bar">
+          <span class="fname">groups/main/HEARTBEAT.md</span>
+          <span class="ftag">standing orders</span>
+        </div>
+        <div class="doc">
+          <h5>Every heartbeat</h5>
+          <ul>
+            <li>Check for failed deployments — alert me if any</li>
+            <li>Watch the inbox for anything from finance@</li>
+          </ul>
+          <h5>Daily, morning</h5>
+          <ul>
+            <li>Summarize my calendar in three lines</li>
+          </ul>
+          <h5>Weekly, Monday</h5>
+          <ul>
+            <li>Report open PRs older than a week</li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="links">
-      <a href="https://github.com/jsclaw/jsclaw">GitHub</a>
-      <a href="https://www.npmjs.com/package/jsclaw">npm</a>
-      <a href="https://github.com/qwibitai/nanoclaw">nanoclaw</a>
-      <a href="https://github.com/jsclaw/jsclaw/blob/main/LICENSE">MIT License</a>
+<!-- ================= CLI ================= -->
+<section class="alt" id="cli">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Command line</div>
+      <h2>A CLI that works with no daemon running.</h2>
+      <p>Tasks and memory are plain files, so <span class="mono" style="font-size:.85em">npx jsclaw</span> inspects and manages everything directly — no gateway process, no RPC, no port.</p>
     </div>
-    <p>jsclaw v0.0.1 &middot; A JavaScript port of <a href="https://github.com/qwibitai/nanoclaw">nanoclaw</a></p>
-  </footer>
+    <div class="term reveal">
+      <div class="bar"><i></i><i></i><i></i><span>jsclaw — zsh</span></div>
+      <div class="body"><pre><span class="ps">$</span> npx jsclaw status
+<span class="hi">jsclaw v0.0.5</span>
+  runtime:  docker (jsclaw-agent:latest)
+  groups:   ./groups (2: main, research)
+  tasks:    3 total, 2 active
+    main: <span class="ok">heartbeat, soul, memory</span>
 
-  <script>
-    function copyInstall(el) {
-      navigator.clipboard.writeText('npm install jsclaw');
-      const tip = el.querySelector('.tooltip');
-      tip.classList.add('show');
-      setTimeout(() => tip.classList.remove('show'), 1500);
+<span class="ps">$</span> npx jsclaw tasks list
+<span class="hi">b2b5bf61</span>  [active]  cron:0 9 * * 1-5  main  <span class="dim">next: tomorrow 09:00</span>
+          Post the morning briefing to the channel
+
+<span class="ps">$</span> npx jsclaw skill test ./deploy.skill.md <span class="ok">"ship the api"</span>
+<span class="ok">MATCH</span>  deploy-helper <span class="dim">(trigger: deploy|ship|push to prod)</span>
+
+<span class="ps">$</span> npx jsclaw heartbeat main
+<span class="dim">HEARTBEAT_OK</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPARE ================= -->
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Where it fits</div>
+      <h2>The lightweight engine in the claw family.</h2>
+      <p>openclaw is the full platform. nanoclaw is the secure WhatsApp assistant it inspired. jsclaw is the engine underneath, repackaged as a library you can build anything on.</p>
+    </div>
+    <div class="compare-scroll reveal">
+      <table class="compare">
+        <thead>
+          <tr><th></th><th class="hl">jsclaw</th><th>nanoclaw</th><th>openclaw</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Shape</td><td class="hl">Library + CLI</td><td>Personal assistant app</td><td>Full agent platform</td></tr>
+          <tr><td>Language</td><td class="hl">Pure JS, no build step</td><td>TypeScript</td><td>TypeScript</td></tr>
+          <tr><td>Host dependencies</td><td class="hl"><span class="y">0</span></td><td>~7 (sqlite, baileys…)</td><td>Many</td></tr>
+          <tr><td>Container isolation</td><td class="hl"><span class="y">✓</span> core design</td><td><span class="y">✓</span> core design</td><td>Optional sandbox</td></tr>
+          <tr><td>Heartbeat + scheduler</td><td class="hl"><span class="y">✓</span></td><td>Scheduler only</td><td><span class="y">✓</span></td></tr>
+          <tr><td>SOUL.md · memory · skills</td><td class="hl"><span class="y">✓</span> openclaw-compatible</td><td><span class="n2">—</span></td><td><span class="y">✓</span></td></tr>
+          <tr><td>Channels</td><td class="hl">Bring your own (interface)</td><td>WhatsApp, Telegram</td><td>26+ built in</td></tr>
+          <tr><td>Daemon required</td><td class="hl"><span class="y">No</span></td><td>Yes</td><td>Yes (gateway)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULES ================= -->
+<section class="alt" id="modules">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">API surface</div>
+      <h2>Twelve small modules. Import what you need.</h2>
+      <p>Granular ESM exports — every module works standalone. Full reference in the <a href="https://github.com/jsclaw/jsclaw#readme">README</a>.</p>
+    </div>
+    <div class="mod-grid reveal">
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/container-runner.js"><div class="p">jsclaw/container-runner</div><div class="d">Spawn containers, stream sentinel-delimited output</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/task-scheduler.js"><div class="p">jsclaw/task-scheduler</div><div class="d">Execute due tasks, never double-fire</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/heartbeat.js"><div class="p">jsclaw/heartbeat</div><div class="d">Periodic wake-ups, quiet hours, OK suppression</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/cron.js"><div class="p">jsclaw/cron</div><div class="d">5-field cron parser, zero deps</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/task-store.js"><div class="p">jsclaw/task-store</div><div class="d">JSON task persistence + MCP loop wiring</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/memory.js"><div class="p">jsclaw/memory</div><div class="d">Markdown memory: load, append, search</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/skills.js"><div class="p">jsclaw/skills</div><div class="d">SKILL.md parsing, triggers, prompt injection</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/channel.js"><div class="p">jsclaw/channel</div><div class="d">Channel interface + outbound routing</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/bindings.js"><div class="p">jsclaw/bindings</div><div class="d">Multi-agent routing, most-specific-wins</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/webhooks.js"><div class="p">jsclaw/webhooks</div><div class="d">HTTP ingress + outgoing event hooks</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/group-queue.js"><div class="p">jsclaw/group-queue</div><div class="d">Per-group concurrency, global limits</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/mount-security.js"><div class="p">jsclaw/mount-security</div><div class="d">Allowlist mount validation</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Ship an autonomous agent <em>this afternoon</em>.</h2>
+    <p>One install, one Docker build, one Markdown file with standing orders.</p>
+    <div class="install-row">
+      <div class="install-pill" onclick="copyInstall(this)">
+        <span class="ps1">$</span>
+        <span>npm install jsclaw</span>
+        <span class="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+        <span class="tip">Copied</span>
+      </div>
+      <a class="cta-secondary" href="https://github.com/jsclaw/jsclaw/blob/main/examples/telegram.js">See the Telegram example <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="logo"><span class="mark">&gt;_</span> jsclaw</div>
+        <p>Lightweight container orchestration for Claude AI agents. Pure JavaScript, zero dependencies, MIT.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Project</h4>
+          <a href="https://github.com/jsclaw/jsclaw">GitHub</a>
+          <a href="https://www.npmjs.com/package/jsclaw">npm</a>
+          <a href="https://github.com/jsclaw/jsclaw/issues">Issues</a>
+          <a href="https://github.com/jsclaw/jsclaw#readme">Documentation</a>
+        </div>
+        <div class="foot-col">
+          <h4>Examples</h4>
+          <a href="https://github.com/jsclaw/jsclaw/blob/main/examples/telegram.js">Telegram bot</a>
+          <a href="https://github.com/jsclaw/jsclaw/blob/main/container/Dockerfile">Container image</a>
+        </div>
+        <div class="foot-col">
+          <h4>Family</h4>
+          <a href="https://github.com/qwibitai/nanoclaw">nanoclaw</a>
+          <a href="https://clawdocs.org">openclaw docs</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="yr">2026</span> jsclaw · <a href="https://github.com/jsclaw/jsclaw/blob/main/LICENSE">MIT License</a></span>
+      <span>A JavaScript port of <a href="https://github.com/qwibitai/nanoclaw">nanoclaw</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function copyInstall(el) {
+    navigator.clipboard.writeText('npm install jsclaw');
+    const tip = el.querySelector('.tip');
+    tip.classList.add('show');
+    setTimeout(() => tip.classList.remove('show'), 1400);
+  }
+
+  function showTab(btn, id) {
+    const shell = btn.closest('.code-shell');
+    shell.querySelectorAll('.code-tab').forEach((t) => t.classList.remove('active'));
+    shell.querySelectorAll('.code-pane').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    shell.querySelector('#' + id).classList.add('active');
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }
-  </script>
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
