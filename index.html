@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>jsclaw — Claude agents, each in its own container</title>
-  <meta name="description" content="Pure JavaScript container orchestration for autonomous Claude AI agents. Heartbeat, scheduler, memory, skills, channels. Zero dependencies.">
+  <meta name="description" content="Pure JavaScript container orchestration for autonomous Claude AI agents. One command runs the full host: gateway, webchat, heartbeat, scheduler, Nostr DMs, MCP. Zero dependencies.">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -14,7 +14,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="jsclaw — Claude agents, each in its own container. Zero dependencies, 63 tests, pure JavaScript.">
+  <meta property="og:image:alt" content="jsclaw — Claude agents, each in its own container. Zero dependencies, 109 tests, pure JavaScript.">
   <meta property="og:url" content="https://jsclaw.dev">
   <meta property="og:site_name" content="jsclaw">
   <meta property="og:locale" content="en_US">
@@ -37,7 +37,7 @@
     "description": "Pure JavaScript container orchestration for autonomous Claude AI agents. Heartbeat, scheduler, memory, skills, channels. Zero dependencies.",
     "url": "https://jsclaw.dev",
     "downloadUrl": "https://www.npmjs.com/package/jsclaw",
-    "softwareVersion": "0.0.5",
+    "softwareVersion": "0.0.10",
     "license": "https://opensource.org/licenses/MIT",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
@@ -476,7 +476,8 @@
     <a class="logo" href="#"><span class="mark">&gt;_</span> jsclaw</a>
     <div class="links">
       <a href="#features">Features</a>
-      <a href="#how">How it works</a>
+      <a href="#gateway">Gateway</a>
+      <a href="#nostr">Nostr</a>
       <a href="#code">Quick start</a>
       <a href="#cli">CLI</a>
       <a href="#modules">API</a>
@@ -491,11 +492,11 @@
 <!-- ================= HERO ================= -->
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow"><span class="dot"></span> v0.0.5 · Pure JavaScript ESM · MIT</div>
+    <div class="eyebrow"><span class="dot"></span> v0.0.10 · Pure JavaScript ESM · MIT</div>
     <h1>Claude agents,<br>each in <em>its own container</em>.</h1>
     <p class="sub">
-      jsclaw is the lightweight orchestration engine for autonomous Claude AI agents —
-      isolated in Docker, woken by heartbeats, remembering in Markdown. Zero dependencies.
+      jsclaw is the lightweight engine for autonomous Claude AI agents — isolated in Docker,
+      woken by heartbeats, reachable from a browser or over Nostr. Zero dependencies, down to the WebSocket server.
     </p>
     <div class="install-row">
       <div class="install-pill" onclick="copyInstall(this)">
@@ -504,13 +505,13 @@
         <span class="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
         <span class="tip">Copied</span>
       </div>
-      <a class="cta-secondary" href="https://github.com/jsclaw/jsclaw#readme">Read the docs <span class="arr">→</span></a>
+      <a class="cta-secondary" href="#gateway">Then: <span class="mono" style="font-size:.88em">npx jsclaw gateway</span> <span class="arr">→</span></a>
     </div>
     <div class="stats">
       <div class="stat"><div class="n">0</div><div class="l">Dependencies</div></div>
-      <div class="stat"><div class="n">~40 kB</div><div class="l">Installed</div></div>
-      <div class="stat"><div class="n">63</div><div class="l">Tests passing</div></div>
-      <div class="stat"><div class="n">12</div><div class="l">Modules</div></div>
+      <div class="stat"><div class="n">~57 kB</div><div class="l">Installed</div></div>
+      <div class="stat"><div class="n">109</div><div class="l">Tests passing</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Command to run</div></div>
     </div>
   </div>
 </header>
@@ -565,11 +566,85 @@
         <p>Ingress with <code>{{body.field}}</code> templates and secret auth; egress on events like <code>agent.task.completed</code>. CI, Slack, PagerDuty, home automation.</p>
       </div>
       <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>Gateway &amp; webchat</h3>
+        <p><code>npx jsclaw gateway</code> runs the whole host: WebSocket control plane in openclaw's wire shape, token auth, and a browser chat at <code>/chat</code>.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg></div>
+        <h3>Nostr, natively</h3>
+        <p>Your agent gets an npub. Encrypted DMs from any Nostr client — BIP340 Schnorr and NIP-04 in pure <code>node:crypto</code>, verified against the Bitcoin test vectors.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <h3>MCP passthrough</h3>
+        <p>Declare any of the 32,000+ MCP servers in openclaw's <code>mcp.servers</code> shape and your agents get their tools — secrets via stdin, never <code>ps</code>-visible.</p>
+      </div>
+      <div class="feat reveal">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <h3>Mount security</h3>
         <p>Allowlist-validated volume mounts with symlink resolution. <code>.ssh</code>, <code>.aws</code>, <code>.env</code> and friends are blocked by default, always.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ================= GATEWAY ================= -->
+<section id="gateway">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Run it</div>
+      <h2>One command. A whole agent host.</h2>
+      <p>The gateway wires everything — orphan reaping, scheduler, heartbeat, IPC — and exposes a WebSocket control plane in openclaw's frame shape, with a chat UI in your browser. The WebSocket server itself is hand-rolled RFC 6455 on Node built-ins: still zero dependencies.</p>
+    </div>
+    <div class="term reveal">
+      <div class="bar"><i></i><i></i><i></i><span>jsclaw — zsh</span></div>
+      <div class="body"><pre><span class="ps">$</span> npx jsclaw gateway
+
+<span class="hi">jsclaw gateway v0.0.10</span>
+  chat:    <span class="ok">http://127.0.0.1:18789/chat?token=2f0a…</span>
+  ws:      ws://127.0.0.1:18789/?token=2f0a…
+  groups:  main
+  token:   2f0a… <span class="dim">(generated; set JSCLAW_GATEWAY_TOKEN to pin)</span>
+
+<span class="dim">Ctrl-C to stop.</span></pre></div>
+    </div>
+    <p class="reveal" style="margin-top:18px; color:var(--muted); font-size:.92rem;">
+      Open the chat URL and talk to your containerized agent — or connect anything that speaks
+      <span class="mono" style="font-size:.85em">{type:"req", method:"chat.send"}</span>:
+      dashboards, scripts, other agents. Methods: <span class="mono" style="font-size:.85em">status · chat.send · tasks.* · heartbeat.trigger · memory.*</span>
+    </p>
+  </div>
+</section>
+
+<!-- ================= NOSTR ================= -->
+<section class="alt" id="nostr">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Decentralized</div>
+      <h2>Your agent has an <em style="color:var(--terra)">npub</em>.</h2>
+      <p>DM it from Damus, Amethyst, or any Nostr client — encrypted NIP-04 DMs, no bot tokens, no platform accounts, no central server. The only claw runtime with a decentralized channel built in, and the whole stack — BIP340 Schnorr, NIP-04, bech32, relays — is <code class="mono" style="font-size:.85em">node:crypto</code> + native WebSocket.</p>
+    </div>
+    <div class="code-shell reveal">
+      <div class="code-tabs"><button class="code-tab active">nostr-agent.js</button></div>
+      <div class="code-panes"><div class="code-pane active"><pre><span class="kw">import</span> { <span class="fn">createNostrChannel</span> } <span class="kw">from</span> <span class="str">'jsclaw'</span>;
+
+<span class="kw">const</span> channel = <span class="fn">createNostrChannel</span>({
+  <span class="prop">privateKey</span>: process.env.<span class="prop">NOSTR_PRIVATE_KEY</span>,        <span class="cm">// hex or nsec</span>
+  <span class="prop">relays</span>: [<span class="str">'wss://relay.damus.io'</span>, <span class="str">'wss://nos.lol'</span>],
+  <span class="prop">allowedPubkeys</span>: [<span class="str">'npub1you…'</span>],                   <span class="cm">// default-closed</span>
+  <span class="prop">onMessage</span>: (jid, text) =&gt; { <span class="cm">/* run the agent, reply */</span> },
+});
+
+<span class="kw">await</span> channel.<span class="fn">connect</span>();
+console.<span class="fn">log</span>(<span class="str">'DM your agent at'</span>, channel.npub);</pre></div></div>
+    </div>
+    <p class="reveal" style="margin-top:18px; color:var(--muted); font-size:.92rem;">
+      Every inbound event is signature-verified; only allowlisted pubkeys reach the agent.
+      Schnorr signing is validated against the official
+      <a href="https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv" style="color:var(--terra-dark); border-bottom:1px solid var(--terra-soft);">BIP340 test vectors</a>
+      and cross-checked against node:crypto's independent secp256k1.
+    </p>
   </div>
 </section>
 
@@ -776,7 +851,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
     <div class="term reveal">
       <div class="bar"><i></i><i></i><i></i><span>jsclaw — zsh</span></div>
       <div class="body"><pre><span class="ps">$</span> npx jsclaw status
-<span class="hi">jsclaw v0.0.5</span>
+<span class="hi">jsclaw v0.0.10</span>
   runtime:  docker (jsclaw-agent:latest)
   groups:   ./groups (2: main, research)
   tasks:    3 total, 2 active
@@ -814,9 +889,9 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
           <tr><td>Host dependencies</td><td class="hl"><span class="y">0</span></td><td>~7 (sqlite, baileys…)</td><td>Many</td></tr>
           <tr><td>Container isolation</td><td class="hl"><span class="y">✓</span> core design</td><td><span class="y">✓</span> core design</td><td>Optional sandbox</td></tr>
           <tr><td>Heartbeat + scheduler</td><td class="hl"><span class="y">✓</span></td><td>Scheduler only</td><td><span class="y">✓</span></td></tr>
-          <tr><td>SOUL.md · memory · skills</td><td class="hl"><span class="y">✓</span> openclaw-compatible</td><td><span class="n2">—</span></td><td><span class="y">✓</span></td></tr>
-          <tr><td>Channels</td><td class="hl">Bring your own (interface)</td><td>WhatsApp, Telegram</td><td>26+ built in</td></tr>
-          <tr><td>Daemon required</td><td class="hl"><span class="y">No</span></td><td>Yes</td><td>Yes (gateway)</td></tr>
+          <tr><td>SOUL.md · memory · skills · MCP</td><td class="hl"><span class="y">✓</span> openclaw-compatible</td><td><span class="n2">—</span></td><td><span class="y">✓</span></td></tr>
+          <tr><td>Channels</td><td class="hl">Nostr built in + interface</td><td>WhatsApp, Telegram</td><td>26+ built in</td></tr>
+          <tr><td>Gateway / web UI</td><td class="hl"><span class="y">✓</span> optional, one command</td><td><span class="n2">—</span></td><td><span class="y">✓</span> required</td></tr>
         </tbody>
       </table>
     </div>
@@ -828,7 +903,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
   <div class="wrap">
     <div class="sec-head reveal">
       <div class="kicker">API surface</div>
-      <h2>Twelve small modules. Import what you need.</h2>
+      <h2>Small modules. Import what you need.</h2>
       <p>Granular ESM exports — every module works standalone. Full reference in the <a href="https://github.com/jsclaw/jsclaw#readme">README</a>.</p>
     </div>
     <div class="mod-grid reveal">
@@ -842,6 +917,9 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/channel.js"><div class="p">jsclaw/channel</div><div class="d">Channel interface + outbound routing</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/bindings.js"><div class="p">jsclaw/bindings</div><div class="d">Multi-agent routing, most-specific-wins</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/webhooks.js"><div class="p">jsclaw/webhooks</div><div class="d">HTTP ingress + outgoing event hooks</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/gateway.js"><div class="p">jsclaw/gateway</div><div class="d">WebSocket control plane + webchat</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/nostr.js"><div class="p">jsclaw/nostr</div><div class="d">Decentralized DMs, zero-dep Schnorr</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/ws.js"><div class="p">jsclaw/ws</div><div class="d">RFC 6455 server on Node built-ins</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/group-queue.js"><div class="p">jsclaw/group-queue</div><div class="d">Per-group concurrency, global limits</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/main/src/mount-security.js"><div class="p">jsclaw/mount-security</div><div class="d">Allowlist mount validation</div></a>
     </div>

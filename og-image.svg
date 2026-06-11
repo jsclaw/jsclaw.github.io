@@ -13,7 +13,7 @@
   <text x="86" y="318" font-family="Georgia, serif" font-size="58" font-style="italic" fill="#C15F3C">its own container.</text>
 
   <!-- Sub -->
-  <text x="87" y="372" font-family="-apple-system, Helvetica, sans-serif" font-size="23" fill="#63615C">Heartbeat autonomy · Markdown memory · zero deps</text>
+  <text x="87" y="372" font-family="-apple-system, Helvetica, sans-serif" font-size="23" fill="#63615C">Gateway · Nostr DMs · heartbeat autonomy · zero deps</text>
 
   <!-- Install pill -->
   <rect x="84" y="420" width="350" height="58" rx="29" fill="#24231F"/>
@@ -24,10 +24,10 @@
   <text x="86" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">0</text>
   <text x="86" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">DEPENDENCIES</text>
   <line x1="222" y1="528" x2="222" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
-  <text x="246" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">~40 kB</text>
+  <text x="246" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">~57 kB</text>
   <text x="246" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">INSTALLED</text>
   <line x1="400" y1="528" x2="400" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
-  <text x="424" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">63</text>
+  <text x="424" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">109</text>
   <text x="424" y="576" font-family="-apple-system, sans-serif" font-size="13" letter-spacing="1" fill="#8A877D">TESTS</text>
   <line x1="520" y1="528" x2="520" y2="578" stroke="#E5E2D9" stroke-width="1.5"/>
   <text x="544" y="552" font-family="Georgia, serif" font-size="30" fill="#161614">jsclaw.dev</text>
