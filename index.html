@@ -605,7 +605,7 @@
 <span class="hi">jsclaw gateway v0.0.10</span>
   chat:    <span class="ok">http://127.0.0.1:18789/chat?token=2f0a…</span>
   ws:      ws://127.0.0.1:18789/?token=2f0a…
-  groups:  main
+  agents:  main
   token:   2f0a… <span class="dim">(generated; set JSCLAW_GATEWAY_TOKEN to pin)</span>
 
 <span class="dim">Ctrl-C to stop.</span></pre></div>
@@ -682,7 +682,7 @@ console.<span class="fn">log</span>(<span class="str">'DM your agent at'</span>,
         <text x="646" y="147" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">mcp-server</text>
         <text x="646" y="163" text-anchor="middle" font-size="10.5" fill="#63615C">send_message · schedule_task</text>
         <rect x="496" y="186" width="300" height="46" rx="9" fill="#F0EEE6"/>
-        <text x="646" y="205" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">/workspace/group</text>
+        <text x="646" y="205" text-anchor="middle" font-size="12.5" font-weight="600" fill="#161614" font-family="JetBrains Mono, monospace">/workspace/agent</text>
         <text x="646" y="221" text-anchor="middle" font-size="10.5" fill="#63615C">SOUL.md · memory/ · HEARTBEAT.md</text>
         <rect x="496" y="244" width="300" height="38" rx="9" fill="#F0EEE6"/>
         <text x="646" y="267" text-anchor="middle" font-size="11.5" font-weight="500" fill="#63615C" font-family="JetBrains Mono, monospace">isolated filesystem, own cwd</text>
@@ -702,7 +702,7 @@ console.<span class="fn">log</span>(<span class="str">'DM your agent at'</span>,
         <line x1="194" y1="298" x2="194" y2="330" stroke="#E5E2D9" stroke-width="1.5"/>
         <line x1="646" y1="298" x2="646" y2="330" stroke="#E5E2D9" stroke-width="1.5"/>
         <rect x="94" y="334" width="200" height="52" rx="10" fill="#F0EEE6" stroke="#E5E2D9"/>
-        <text x="194" y="356" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9E4B2D" font-family="JetBrains Mono, monospace">data/ipc/{group}/</text>
+        <text x="194" y="356" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9E4B2D" font-family="JetBrains Mono, monospace">data/ipc/{agent}/</text>
         <text x="194" y="373" text-anchor="middle" font-size="10.5" fill="#63615C" font-family="JetBrains Mono, monospace">messages/ tasks/ input/</text>
         <rect x="546" y="334" width="200" height="52" rx="10" fill="#F0EEE6" stroke="#E5E2D9"/>
         <text x="646" y="356" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9E4B2D" font-family="JetBrains Mono, monospace">/workspace/ipc/</text>
@@ -735,7 +735,7 @@ console.<span class="fn">log</span>(<span class="str">'DM your agent at'</span>,
 <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runContainerAgent</span>(
   { <span class="prop">name</span>: <span class="str">'main'</span>, <span class="prop">folder</span>: <span class="str">'main'</span> },
   { <span class="prop">prompt</span>: <span class="str">'Summarize the repos in my workspace.'</span>,
-    <span class="prop">groupFolder</span>: <span class="str">'main'</span>, <span class="prop">chatJid</span>: <span class="str">'user-1'</span>, <span class="prop">isMain</span>: <span class="kw">true</span> },
+    <span class="prop">agentId</span>: <span class="str">'main'</span>, <span class="prop">chatJid</span>: <span class="str">'user-1'</span>, <span class="prop">isMain</span>: <span class="kw">true</span> },
   <span class="kw">null</span>,
   <span class="kw">async</span> (output) =&gt; console.<span class="fn">log</span>(output.result),  <span class="cm">// streams as it works</span>
   <span class="fn">createConfig</span>(),
@@ -752,8 +752,8 @@ console.<span class="fn">log</span>(<span class="str">'DM your agent at'</span>,
 <span class="cm">// …the scheduler fires them (cron / interval / once)…</span>
 <span class="fn">startTaskScheduler</span>({ store, <span class="prop">runTask</span>: runAgentForTask }, config);
 
-<span class="cm">// …and the heartbeat wakes each group to check HEARTBEAT.md.</span>
-<span class="fn">startHeartbeat</span>({ <span class="prop">getGroups</span>: () =&gt; groups, <span class="prop">runAgent</span>, <span class="prop">onAlert</span> },
+<span class="cm">// …and the heartbeat wakes each agent to check HEARTBEAT.md.</span>
+<span class="fn">startHeartbeat</span>({ <span class="prop">getAgents</span>: () =&gt; agents, <span class="prop">runAgent</span>, <span class="prop">onAlert</span> },
   config, { <span class="prop">quietHours</span>: { <span class="prop">start</span>: <span class="str">'22:00'</span>, <span class="prop">end</span>: <span class="str">'07:00'</span> } });</pre></div>
         <div class="code-pane" id="tab-skill"><pre><span class="cm">---</span>
 <span class="prop">name</span>: <span class="str">deploy-helper</span>
@@ -781,7 +781,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
 <span class="cm">// Outbound routing by JID — agents' send_message just works</span>
 <span class="fn">startIpcWatcher</span>({
   <span class="prop">sendMessage</span>: channels.sendMessage,
-  <span class="cm">/* onTask, getRegisteredGroups */</span>
+  <span class="cm">/* onTask, getRegisteredAgents */</span>
 }, <span class="fn">createConfig</span>());</pre></div>
       </div>
     </div>
@@ -794,12 +794,12 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
     <div class="sec-head center reveal">
       <div class="kicker">Autonomy, on paper</div>
       <h2>Two Markdown files turn a chatbot<br>into a colleague.</h2>
-      <p>Drop them in a group folder. The agent reads both — one shapes who it is, the other tells it what to watch.</p>
+      <p>Drop them in an agent folder. The agent reads both — one shapes who it is, the other tells it what to watch.</p>
     </div>
     <div class="files-grid">
       <div class="file-card reveal">
         <div class="bar">
-          <span class="fname">groups/main/SOUL.md</span>
+          <span class="fname">agents/main/SOUL.md</span>
           <span class="ftag">identity</span>
         </div>
         <div class="doc">
@@ -818,7 +818,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
       </div>
       <div class="file-card reveal">
         <div class="bar">
-          <span class="fname">groups/main/HEARTBEAT.md</span>
+          <span class="fname">agents/main/HEARTBEAT.md</span>
           <span class="ftag">standing orders</span>
         </div>
         <div class="doc">
@@ -854,7 +854,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
       <div class="body"><pre><span class="ps">$</span> npx jsclaw status
 <span class="hi">jsclaw v0.0.10</span>
   runtime:  docker (jsclaw-agent:latest)
-  groups:   ./groups (2: main, research)
+  agents:   ./agents (2: main, research)
   tasks:    3 total, 2 active
     main: <span class="ok">heartbeat, soul, memory</span>
 
@@ -921,7 +921,7 @@ channels.<span class="fn">register</span>(discordChannel);    <span class="cm">/
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/gateway.js"><div class="p">jsclaw/gateway</div><div class="d">WebSocket control plane + webchat</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/nostr.js"><div class="p">jsclaw/nostr</div><div class="d">Decentralized DMs, zero-dep Schnorr</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/ws.js"><div class="p">jsclaw/ws</div><div class="d">RFC 6455 server on Node built-ins</div></a>
-      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/group-queue.js"><div class="p">jsclaw/group-queue</div><div class="d">Per-group concurrency, global limits</div></a>
+      <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/agent-queue.js"><div class="p">jsclaw/agent-queue</div><div class="d">Per-agent concurrency, global limits</div></a>
       <a class="mod" href="https://github.com/jsclaw/jsclaw/blob/gh-pages/src/mount-security.js"><div class="p">jsclaw/mount-security</div><div class="d">Allowlist mount validation</div></a>
     </div>
   </div>
